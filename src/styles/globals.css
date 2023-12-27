@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+// font
+@font-face {
+  font-family: 'NotoSansKR';
+  src: url('/assets/fonts/NotoSansKR-VariableFont_wght.ttf') format('truetype');
+  font-display: swap;
+}
+
+// reset
 html,
 body,
 div,

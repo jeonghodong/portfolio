@@ -1,5 +1,9 @@
 const index = () => {
-  return <h1 className="text-3xl font-bold underline">hi</h1>;
+  return (
+    <p className="text-[20px] font-thin font-NotoSansKR">
+      안녕하세요 저는ㄴㅁㅇㄹ 정호동입니다.fadsfa
+    </p>
+  );
 };
 
 export default index;
