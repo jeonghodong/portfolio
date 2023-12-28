@@ -10,12 +10,15 @@ module.exports = {
   ],
   theme: {
     screens: {
-      sm: '640px',
-      md: '768px',
-      lg: '1024px',
-      xl: '1280px',
-      '2xl': '1536px',
+      sm: { min: '0px', max: '1079px' },
+      lg: { min: '1080px', max: '1900px' },
     },
+
+    // screens: {
+    //   sm: { min: '390px', max: '819px' },
+    //   md: { min: '820px', max: '1023px' },
+    //   lg: { min: '1080px' },
+    // },
 
     fontFamily: {
       NotoSansKR: ['NotoSansKR'],
