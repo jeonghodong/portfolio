@@ -1,6 +1,6 @@
 import logo from '@/assets/images/logo.webp';
 import Image from 'next/image';
-import MenuTab from '../menuTab';
+import MenuTab from '../MenuTab';
 
 const ALL_MENU_LIST = ['About', 'Skills', 'Works', 'Contact', 'MODE'];
 
@@ -9,7 +9,7 @@ const RIGHT_MENU_ITEM = ['Contact', 'MODE'];
 
 const Header = () => {
   return (
-    <div className="w-[100%] fixed h-[77px] border-b-[.5px] border-[#959692] sm:border-none px-[30px] items-center flex ">
+    <div className="w-[100%] min-w-[200px] h-[77px] p-10 mb-[33px] border-b-[.5px] border-[#959692] sm:border-none items-center flex">
       <div>
         <Image src={logo} alt="로고 사진" width={220} height={220} />
       </div>

@@ -11,7 +11,7 @@ module.exports = {
   theme: {
     screens: {
       sm: { min: '0px', max: '1079px' },
-      lg: { min: '1080px', max: '1900px' },
+      lg: { min: '1080px', max: '3000px' },
     },
 
     // screens: {

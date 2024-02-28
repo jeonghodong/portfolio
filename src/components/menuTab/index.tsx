@@ -1,5 +1,6 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import Menu from '../Menu';
 
 interface MenuTabProps {
   MENU_LIST: string[];
@@ -21,11 +22,6 @@ const MenuTab = ({ MENU_LIST }: MenuTabProps) => {
     closed: { rotate: 0, y: 0 },
   };
 
-  const menuVariants = {
-    open: { y: 0 },
-    closed: { y: '-100%' },
-  };
-
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
@@ -34,7 +30,7 @@ const MenuTab = ({ MENU_LIST }: MenuTabProps) => {
     <div>
       <div
         onClick={handleClick}
-        className="lg:hidden border-[2px] border-[white] rounded-[20px] w-[110px] h-[40px] flex justify-center items-center py-[12px] px-[20px]  cursor-pointer"
+        className="lg:hidden border-[2px] border-[white] rounded-[20px] w-[110px] h-[40px] flex justify-center items-center py-[12px] px-[20px] cursor-pointer"
       >
         <div>
           <p className="text-[white] text-[12px]">Menu</p>
@@ -56,21 +52,8 @@ const MenuTab = ({ MENU_LIST }: MenuTabProps) => {
             animate={isOpen ? 'open' : 'closed'}
           />
         </div>
+        <Menu open={isOpen} />
       </div>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
-            className="fixed top-0 left-0 z-[-1] w-full bg-amber-500 h-4/5 lg:hidden"
-          >
-            {/* 메뉴 내용을 여기에 작성합니다. */}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
