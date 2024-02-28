@@ -5,6 +5,8 @@ interface MenuProps {
   open: boolean;
 }
 
+const ALL_MENU_LIST = ['About', 'Skills', 'Works', 'Contact', 'MODE'];
+
 const index = ({ open }: MenuProps) => {
   const transitionValue = {
     type: 'spring',
@@ -28,6 +30,9 @@ const index = ({ open }: MenuProps) => {
           className="fixed top-0 left-0 z-[-1] w-full bg-amber-500 h-2/5 rounded-b-[30px]"
         >
           {/* 메뉴 내용을 여기에 작성합니다. */}
+          {ALL_MENU_LIST.map((item, index) => {
+            return <div key={index}>{item}</div>;
+          })}
         </motion.div>
       )}
     </AnimatePresence>

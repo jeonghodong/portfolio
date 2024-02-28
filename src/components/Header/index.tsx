@@ -2,8 +2,6 @@ import logo from '@/assets/images/logo.webp';
 import Image from 'next/image';
 import MenuTab from '../MenuTab';
 
-const ALL_MENU_LIST = ['About', 'Skills', 'Works', 'Contact', 'MODE'];
-
 const LEFT_MENU_ITEM = ['About', 'Skills', 'Works'];
 const RIGHT_MENU_ITEM = ['Contact', 'MODE'];
 
@@ -29,7 +27,7 @@ const Header = () => {
           ))}
         </div>
       </div>
-      <MenuTab MENU_LIST={ALL_MENU_LIST} />
+      <MenuTab />
     </div>
   );
 };
