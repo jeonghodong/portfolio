@@ -139,7 +139,11 @@ export default function Scene() {
   return (
     <>
       <div ref={canvasContainerRef} className="fixed inset-0">
-        <Canvas gl={{ antialias: true, alpha: false }} dpr={[1, 2]}>
+        <Canvas
+          gl={{ antialias: true, alpha: true }}
+          dpr={[1, 2]}
+        >
+          <color attach="background" args={['#0a0118']} />
           <PerspectiveCamera
             makeDefault
             position={[
@@ -150,15 +154,17 @@ export default function Scene() {
             fov={65}
           />
 
-          {/* Lighting */}
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[10, 10, 5]} intensity={2} />
-          <pointLight position={[-10, -10, -5]} intensity={1.2} />
+          {/* Arcana-themed Lighting */}
+          <ambientLight intensity={0.4} color="#b19cd9" />
+          <directionalLight position={[10, 10, 5]} intensity={1.2} color="#ffd700" />
+          <pointLight position={[-10, -10, -5]} intensity={0.8} color="#b19cd9" />
+          <pointLight position={[10, -5, 5]} intensity={0.6} color="#00ffff" />
           <spotLight
             position={[0, 10, 5]}
             angle={0.5}
             penumbra={1}
-            intensity={1.5}
+            intensity={1.0}
+            color="#ffd700"
             castShadow
           />
 
