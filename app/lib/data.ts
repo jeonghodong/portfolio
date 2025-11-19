@@ -1,4 +1,4 @@
-import { PersonalInfo, Project, Skill, Experience } from "@/app/types";
+import { PersonalInfo, Project, Skill, Experience, Planet } from "@/app/types";
 
 export const personalInfo: PersonalInfo = {
   name: "Jeonghо Dong",
@@ -169,3 +169,84 @@ export const sectionAudios = {
   skills: "/audio/skills.mp3",
   contact: "/audio/contact.mp3",
 };
+
+export const planets: Planet[] = [
+  {
+    id: "1",
+    name: "Mercury",
+    name_ko: "수성",
+    size: 1.0,
+    textureUrl: "/textures/planets/mercury.jpg",
+    position: [-18, 5, -15],
+    rotationSpeed: 0.004,
+    projectId: "1",
+  },
+  {
+    id: "2",
+    name: "Venus",
+    name_ko: "금성",
+    size: 1.4,
+    textureUrl: "/textures/planets/venus.jpg",
+    position: [-8, -6, 10],
+    rotationSpeed: 0.002,
+    projectId: "2",
+  },
+  {
+    id: "3",
+    name: "Earth",
+    name_ko: "지구",
+    size: 1.5,
+    textureUrl: "/textures/planets/earth.jpg",
+    position: [5, 3, -8],
+    rotationSpeed: 0.003,
+    projectId: "3",
+  },
+  {
+    id: "4",
+    name: "Mars",
+    name_ko: "화성",
+    size: 1.2,
+    textureUrl: "/textures/planets/mars.jpg",
+    position: [15, -4, 5],
+    rotationSpeed: 0.003,
+    projectId: "4",
+  },
+  {
+    id: "5",
+    name: "Jupiter",
+    name_ko: "목성",
+    size: 3.0,
+    textureUrl: "/textures/planets/jupiter.jpg",
+    position: [20, 8, -20],
+    rotationSpeed: 0.005,
+  },
+  {
+    id: "6",
+    name: "Saturn",
+    name_ko: "토성",
+    size: 2.8,
+    textureUrl: "/textures/planets/saturn.jpg",
+    position: [-15, -10, -25],
+    rotationSpeed: 0.004,
+    hasRing: true,
+    ringTextureUrl: "/textures/planets/saturn_ring.png",
+  },
+  {
+    id: "7",
+    name: "Uranus",
+    name_ko: "천왕성",
+    size: 2.0,
+    textureUrl: "/textures/planets/uranus.jpg",
+    position: [12, -8, 18],
+    rotationSpeed: 0.002,
+  },
+  {
+    id: "8",
+    name: "Neptune",
+    name_ko: "해왕성",
+    size: 1.8,
+    textureUrl: "/textures/planets/neptune.jpg",
+    position: [-5, 12, -30],
+    rotationSpeed: 0.002,
+  },
+];

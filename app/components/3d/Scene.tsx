@@ -4,226 +4,288 @@ import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ParticleBackground from "./ParticleBackground";
-import CardStack from "./CardStack";
+import SpaceBackground from "./SpaceBackground";
+import PlanetSystem from "./PlanetSystem";
+import CameraController from "./CameraController";
 import CardDetailContent from "../ui/CardDetailContent";
 import LanguageToggle from "../ui/LanguageToggle";
 import type { Project } from "@/app/types";
+import { planets, projects } from "@/app/lib/data";
+import { useLanguage } from "@/app/contexts/LanguageContext";
 
 export default function Scene() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [scrollOffset, setScrollOffset] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [isEntering, setIsEntering] = useState(false);
+  const [enteringPlanetId, setEnteringPlanetId] = useState<string | null>(null);
+  const [hoveredPlanetId, setHoveredPlanetId] = useState<string | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const touchStartRef = useRef({ x: 0, time: 0 });
-  const velocityRef = useRef(0);
-  const isMobileRef = useRef(false);
+  const { language } = useLanguage();
 
   // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768 || "ontouchstart" in window;
       setIsMobile(mobile);
-      isMobileRef.current = mobile;
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Mouse parallax effect + horizontal scroll (Desktop only)
-  useEffect(() => {
-    if (isMobile) return;
+  const handlePlanetEnter = (planetId: string) => {
+    setIsEntering(true);
+    setEnteringPlanetId(planetId);
+  };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (selectedProject) return;
+  const handleClose = () => {
+    setSelectedProject(null);
+    setIsEntering(false);
+    setEnteringPlanetId(null);
+    setHoveredPlanetId(null);
+  };
 
-      const x = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
-      const y = -(e.clientY / window.innerHeight - 0.5) * 2; // Inverted for camera
-      setMousePosition({ x, y });
-    };
+  // Get hovered planet and project info for preview
+  const hoveredPlanet = hoveredPlanetId
+    ? planets.find(p => p.id === hoveredPlanetId)
+    : null;
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [selectedProject, isMobile]);
+  const hoveredProject = hoveredPlanet?.projectId
+    ? projects.find(p => p.id === hoveredPlanet.projectId)
+    : null;
 
-  // Touch events for mobile
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (selectedProject) return;
-      touchStartRef.current = {
-        x: e.touches[0].clientX,
-        time: Date.now(),
-      };
-      velocityRef.current = 0; // Reset velocity on new touch
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (selectedProject) return;
-
-      const deltaX = e.touches[0].clientX - touchStartRef.current.x;
-      const deltaTime = Date.now() - touchStartRef.current.time;
-
-      // Calculate velocity for inertia
-      velocityRef.current = deltaX / (deltaTime || 1);
-
-      // Update scroll offset
-      setScrollOffset((prev) => {
-        const newOffset = prev + deltaX * 0.02;
-        return Math.max(-30, Math.min(30, newOffset));
-      });
-
-      touchStartRef.current = {
-        x: e.touches[0].clientX,
-        time: Date.now(),
-      };
-    };
-
-    const handleTouchEnd = () => {
-      if (selectedProject) return;
-      // Apply inertia scrolling
-      const applyInertia = () => {
-        if (Math.abs(velocityRef.current) > 0.01) {
-          setScrollOffset((prev) => {
-            const newOffset = prev + velocityRef.current * 2;
-            return Math.max(-30, Math.min(30, newOffset));
-          });
-          velocityRef.current *= 0.95; // Decay
-          requestAnimationFrame(applyInertia);
-        }
-      };
-      applyInertia();
-    };
-
-    const container = canvasContainerRef.current;
-    if (container) {
-      container.addEventListener("touchstart", handleTouchStart);
-      container.addEventListener("touchmove", handleTouchMove);
-      container.addEventListener("touchend", handleTouchEnd);
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("touchstart", handleTouchStart);
-        container.removeEventListener("touchmove", handleTouchMove);
-        container.removeEventListener("touchend", handleTouchEnd);
-      }
-    };
-  }, [selectedProject, isMobile]);
-
-  // Smooth scroll animation based on mouse X position (Desktop only)
-  useEffect(() => {
-    let animationId: number;
-    const animate = () => {
-      // Check if mobile inside the animation loop
-      if (!isMobileRef.current) {
-        setScrollOffset((prev) => {
-          // Mouse X maps to scroll offset: -1 (left) to 1 (right) → scroll range
-          const targetOffset = -mousePosition.x * 15; // Multiply by scroll range
-          const diff = targetOffset - prev;
-          return prev + diff * 0.05; // Smooth lerp
-        });
-      }
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animationId = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
-  }, [mousePosition.x]); // Only re-run when mousePosition.x changes
+  // Get entering planet for effect
+  const enteringPlanet = enteringPlanetId
+    ? planets.find(p => p.id === enteringPlanetId)
+    : null;
 
   return (
     <>
       {/* Language Toggle */}
       <LanguageToggle />
 
+      {/* Instructions */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 text-white/60 text-sm pointer-events-none text-center px-4">
+        {language === 'ko'
+          ? "드래그하여 탐색 • 행성 클릭하여 선택 • 다시 클릭하여 진입"
+          : "Drag to explore • Click planet to select • Click again to enter"}
+      </div>
+
+      {/* Project Preview Panel - shows when hovering over planet */}
+      <AnimatePresence>
+        {hoveredProject && !selectedProject && (
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ duration: 0.3 }}
+            className="fixed right-6 top-1/2 -translate-y-1/2 z-30 w-80 max-w-[calc(100vw-3rem)]"
+          >
+            <div className="bg-black/70 backdrop-blur-md rounded-xl p-5 border border-white/10">
+              {/* Planet name */}
+              <div className="flex items-center gap-2 mb-3">
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <span className="text-white/60 text-sm">
+                  {hoveredPlanet?.name_ko} • {hoveredPlanet?.name}
+                </span>
+              </div>
+
+              {/* Project title */}
+              <h3 className="text-xl font-bold text-white mb-2">
+                {language === 'ko' ? hoveredProject.title_ko : hoveredProject.title_en}
+              </h3>
+
+              {/* Project description */}
+              <p className="text-white/70 text-sm mb-4 line-clamp-3">
+                {language === 'ko' ? hoveredProject.description_ko : hoveredProject.description_en}
+              </p>
+
+              {/* Technologies */}
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {hoveredProject.technologies.slice(0, 4).map((tech) => (
+                  <span
+                    key={tech}
+                    className="px-2 py-0.5 bg-white/10 rounded text-xs text-white/80"
+                  >
+                    {tech}
+                  </span>
+                ))}
+                {hoveredProject.technologies.length > 4 && (
+                  <span className="px-2 py-0.5 text-xs text-white/50">
+                    +{hoveredProject.technologies.length - 4}
+                  </span>
+                )}
+              </div>
+
+              {/* Click hint */}
+              <div className="text-center text-white/50 text-xs">
+                {language === 'ko' ? "다시 클릭하여 진입" : "Click again to enter"}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile: Selected planet indicator */}
+      {isMobile && hoveredPlanetId && !selectedProject && !hoveredProject && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30"
+        >
+          <div className="bg-black/70 backdrop-blur-md rounded-full px-4 py-2 text-white/80 text-sm">
+            {hoveredPlanet?.name_ko} - {language === 'ko' ? '준비 중' : 'Coming Soon'}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Planet entry transition effect */}
+      <AnimatePresence>
+        {isEntering && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 50, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-30 pointer-events-none flex items-center justify-center"
+          >
+            <div
+              className="w-20 h-20 rounded-full"
+              style={{
+                background: `radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(100,150,255,0.6) 50%, transparent 70%)`,
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div ref={canvasContainerRef} className="fixed inset-0">
         <Canvas
           gl={{ antialias: true, alpha: true }}
-          dpr={[1, 2]}
+          dpr={[1, isMobile ? 1.5 : 2]}
+          onPointerMissed={() => {
+            // Click on empty space deselects planet
+            if (hoveredPlanetId && !selectedProject) {
+              setHoveredPlanetId(null);
+            }
+          }}
         >
-          <color attach="background" args={['#0a0118']} />
+          <color attach="background" args={['#020010']} />
+          <fog attach="fog" args={['#020010', 80, 250]} />
+
           <PerspectiveCamera
             makeDefault
-            position={[
-              0, // No horizontal camera movement, cards move instead
-              isMobile ? 0 : mousePosition.y * 1.0, // Disable Y parallax on mobile
-              9,
-            ]}
-            fov={65}
+            position={[0, 5, 35]}
+            fov={60}
           />
 
-          {/* Arcana-themed Lighting */}
-          <ambientLight intensity={0.4} color="#b19cd9" />
-          <directionalLight position={[10, 10, 5]} intensity={1.2} color="#ffd700" />
-          <pointLight position={[-10, -10, -5]} intensity={0.8} color="#b19cd9" />
-          <pointLight position={[10, -5, 5]} intensity={0.6} color="#00ffff" />
-          <spotLight
-            position={[0, 10, 5]}
-            angle={0.5}
-            penumbra={1}
-            intensity={1.0}
-            color="#ffd700"
+          {/* Camera auto-movement on hover */}
+          <CameraController
+            targetPosition={hoveredPlanet?.position || null}
+            isActive={hoveredPlanetId !== null && !selectedProject}
+          />
+
+          {/* Space Lighting */}
+          <ambientLight intensity={0.4} color="#ffffff" />
+
+          {/* Sun-like main light */}
+          <directionalLight
+            position={[50, 30, 50]}
+            intensity={1.5}
+            color="#fff5e0"
             castShadow
           />
 
+          {/* Subtle fill lights */}
+          <pointLight position={[-30, -20, -30]} intensity={0.4} color="#4488ff" />
+          <pointLight position={[20, -10, 20]} intensity={0.3} color="#ff8844" />
+
+          {/* Rim light for planets */}
+          <directionalLight
+            position={[-30, 10, -20]}
+            intensity={0.5}
+            color="#88aaff"
+          />
+
           <Suspense fallback={null}>
-            <ParticleBackground />
-            <CardStack
-              onCardSelect={setSelectedProject}
+            <SpaceBackground />
+            <PlanetSystem
+              onPlanetSelect={setSelectedProject}
               selectedProject={selectedProject}
-              scrollOffset={scrollOffset}
+              onPlanetEnter={handlePlanetEnter}
+              hoveredPlanetId={hoveredPlanetId}
+              onPlanetHover={setHoveredPlanetId}
+              isMobile={isMobile}
             />
           </Suspense>
 
-          {/* Camera Controls - Disabled rotation, only scroll-based horizontal movement */}
+          {/* Camera Controls - disabled when hovering for smooth auto-movement */}
           <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            enableRotate={false}
+            enableZoom={!hoveredPlanetId}
+            enablePan={!hoveredPlanetId}
+            enableRotate={!hoveredPlanetId}
+            zoomSpeed={0.5}
+            panSpeed={0.5}
+            rotateSpeed={0.5}
+            minDistance={10}
+            maxDistance={80}
+            maxPolarAngle={Math.PI * 0.85}
+            minPolarAngle={Math.PI * 0.15}
           />
         </Canvas>
       </div>
 
-      {/* Backdrop */}
+      {/* Project Detail Modal */}
       <AnimatePresence>
         {selectedProject && (
           <>
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setSelectedProject(null)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md z-40"
+              onClick={handleClose}
+              className="fixed inset-0 z-40"
+              style={{
+                background: `radial-gradient(circle at center, rgba(20,30,60,0.95) 0%, rgba(0,0,0,0.98) 100%)`,
+                backdropFilter: 'blur(10px)',
+              }}
             />
 
-            {/* Detail Content Overlay */}
+            {/* Detail Content */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
+              initial={{ opacity: 0, scale: 0.8, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 50 }}
               transition={{
                 type: "spring",
                 damping: 25,
                 stiffness: 300,
-                delay: 0.1,
+                delay: 0.2,
               }}
-              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
-              style={{ padding: '60px' }}
+              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none p-4 sm:p-10"
             >
-              <div
-                className="pointer-events-auto w-full max-w-[750px] h-full max-h-[650px]"
-              >
+              <div className="pointer-events-auto w-full max-w-[800px] h-full max-h-[700px]">
                 <CardDetailContent
                   project={selectedProject}
-                  onClose={() => setSelectedProject(null)}
+                  onClose={handleClose}
                 />
               </div>
+            </motion.div>
+
+            {/* Planet name indicator */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-6 left-1/2 -translate-x-1/2 z-50 text-white/80 text-lg font-light tracking-widest"
+            >
+              {enteringPlanet && (
+                <span className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
+                  {enteringPlanet.name_ko} {language === 'ko' ? '탐사 중' : 'Exploring'}
+                </span>
+              )}
             </motion.div>
           </>
         )}
