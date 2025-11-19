@@ -117,32 +117,6 @@ export default function Astronaut3D({ targetPosition, isMoving, isLaunching = fa
         <meshStandardMaterial color="#cccccc" metalness={0.3} roughness={0.6} />
       </mesh>
 
-      {/* Left arm */}
-      <group position={[-0.55, 0.4, 0]} rotation={[0, 0, 0.3]}>
-        <mesh>
-          <capsuleGeometry args={[0.12, 0.5, 8, 16]} />
-          <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.5} />
-        </mesh>
-        {/* Glove */}
-        <mesh position={[0, -0.35, 0]}>
-          <sphereGeometry args={[0.15, 16, 16]} />
-          <meshStandardMaterial color="#ff6b35" metalness={0.3} roughness={0.4} />
-        </mesh>
-      </group>
-
-      {/* Right arm */}
-      <group position={[0.55, 0.4, 0]} rotation={[0, 0, -0.3]}>
-        <mesh>
-          <capsuleGeometry args={[0.12, 0.5, 8, 16]} />
-          <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.5} />
-        </mesh>
-        {/* Glove */}
-        <mesh position={[0, -0.35, 0]}>
-          <sphereGeometry args={[0.15, 16, 16]} />
-          <meshStandardMaterial color="#ff6b35" metalness={0.3} roughness={0.4} />
-        </mesh>
-      </group>
-
       {/* Left leg */}
       <group position={[-0.2, -0.7, 0]} rotation={[0.2, 0, 0.1]}>
         <mesh>
