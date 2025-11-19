@@ -8,9 +8,10 @@ interface CameraControllerProps {
   targetPosition: [number, number, number] | null;
   isActive: boolean;
   isEntering?: boolean;
+  targetPlanetSize?: number;
 }
 
-export default function CameraController({ targetPosition, isActive, isEntering = false }: CameraControllerProps) {
+export default function CameraController({ targetPosition, isActive, isEntering = false, targetPlanetSize = 1 }: CameraControllerProps) {
   const { camera } = useThree();
   const defaultPosition = useRef(new THREE.Vector3(0, 5, 35));
   const currentTarget = useRef(new THREE.Vector3(0, 0, 0));
@@ -37,13 +38,14 @@ export default function CameraController({ targetPosition, isActive, isEntering 
       // Move camera towards the target planet
       const target = new THREE.Vector3(...targetPosition);
 
-      // Calculate camera position - closer to the planet but with offset
+      // Calculate camera position based on planet size
       const direction = target.clone().normalize();
-      const cameraDistance = 12; // Distance from planet
+      // Larger planets need more distance, smaller planets can be closer
+      const cameraDistance = 8 + targetPlanetSize * 2;
       const cameraOffset = target.clone().sub(direction.multiplyScalar(cameraDistance));
 
-      // Add some height offset for better viewing angle
-      cameraOffset.y += 3;
+      // Add height offset scaled with planet size
+      cameraOffset.y += 2 + targetPlanetSize * 0.5;
 
       // Smooth camera movement
       camera.position.lerp(cameraOffset, 0.03);

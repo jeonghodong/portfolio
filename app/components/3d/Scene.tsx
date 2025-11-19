@@ -55,13 +55,16 @@ export default function Scene() {
           setSelectedProject(null);
         } else if (sceneMode === 'surface' && !isExiting) {
           handleBackToSpace();
+        } else if (sceneMode === 'space' && hoveredPlanetId) {
+          // Deselect planet in space mode
+          setHoveredPlanetId(null);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sceneMode, selectedProject, isExiting]);
+  }, [sceneMode, selectedProject, isExiting, hoveredPlanetId]);
 
   const handlePlanetEnter = (planetId: string) => {
     const planet = planets.find(p => p.id === planetId);
@@ -312,6 +315,7 @@ export default function Scene() {
                 targetPosition={hoveredPlanet?.position || null}
                 isActive={hoveredPlanetId !== null && !isTransitioning}
                 isEntering={isCameraZooming}
+                targetPlanetSize={hoveredPlanet?.size || 1}
               />
 
               <ambientLight intensity={0.4} color="#ffffff" />

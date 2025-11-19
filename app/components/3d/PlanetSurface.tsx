@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useMemo, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { Planet, Project } from '@/app/types';
@@ -104,11 +104,19 @@ interface PlanetSurfaceProps {
 export default function PlanetSurface({ planet, project, onFlagClick, onBack, isExiting }: PlanetSurfaceProps) {
   const particlesRef = useRef<THREE.Points>(null);
   const astronautRef = useRef<THREE.Group>(null);
+  const leftLegRef = useRef<THREE.Group>(null);
+  const rightLegRef = useRef<THREE.Group>(null);
   const exitProgress = useRef(0);
   const landingProgress = useRef(0);
   const isLandingRef = useRef(true);
+  const astronautPosition = useRef(new THREE.Vector3(2, 0, 0));
+  const targetPosition = useRef(new THREE.Vector3(2, 0, 0));
+  const runAnimationTime = useRef(0);
   const [showLandingFlames, setShowLandingFlames] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
   const { language } = useLanguage();
+  const { pointer, camera, raycaster } = useThree();
+  const groundPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
 
   // Generate terrain particles/dust
   const particlesGeometry = useMemo(() => {
@@ -214,6 +222,63 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
         astronautRef.current.position.y = 0;
         astronautRef.current.rotation.z = 0;
       }
+    }
+
+    // Astronaut mouse following - only when landed and not exiting
+    if (!isLandingRef.current && !isExiting && astronautRef.current) {
+      // Raycast to ground plane
+      raycaster.setFromCamera(pointer, camera);
+      const intersectPoint = new THREE.Vector3();
+      raycaster.ray.intersectPlane(groundPlane.current, intersectPoint);
+
+      if (intersectPoint) {
+        // Limit to terrain bounds
+        const maxRadius = 15;
+        const distance = Math.sqrt(intersectPoint.x * intersectPoint.x + intersectPoint.z * intersectPoint.z);
+        if (distance > maxRadius) {
+          intersectPoint.normalize().multiplyScalar(maxRadius);
+        }
+        targetPosition.current.set(intersectPoint.x, 0, intersectPoint.z);
+      }
+
+      // Move astronaut toward target
+      const currentPos = astronautPosition.current;
+      const distToTarget = currentPos.distanceTo(targetPosition.current);
+
+      if (distToTarget > 0.1) {
+        // Running
+        const moveSpeed = 3;
+        const direction = targetPosition.current.clone().sub(currentPos).normalize();
+        currentPos.add(direction.multiplyScalar(Math.min(moveSpeed * delta, distToTarget)));
+
+        // Face movement direction
+        const angle = Math.atan2(direction.x, direction.z);
+        astronautRef.current.rotation.y = angle;
+
+        // Run animation
+        runAnimationTime.current += delta * 12;
+        if (leftLegRef.current && rightLegRef.current) {
+          leftLegRef.current.rotation.x = Math.sin(runAnimationTime.current) * 0.6;
+          rightLegRef.current.rotation.x = Math.sin(runAnimationTime.current + Math.PI) * 0.6;
+        }
+
+        // Slight body bob
+        astronautRef.current.position.y = Math.abs(Math.sin(runAnimationTime.current)) * 0.1;
+
+        if (!isRunning) setIsRunning(true);
+      } else {
+        // Standing still
+        if (leftLegRef.current && rightLegRef.current) {
+          leftLegRef.current.rotation.x = 0;
+          rightLegRef.current.rotation.x = 0;
+        }
+        astronautRef.current.position.y = 0;
+        if (isRunning) setIsRunning(false);
+      }
+
+      // Update astronaut position
+      astronautRef.current.position.x = currentPos.x;
+      astronautRef.current.position.z = currentPos.z;
     }
 
     // Astronaut exit animation - rocket launch!
@@ -410,33 +475,54 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
           <boxGeometry args={[0.3, 0.4, 0.15]} />
           <meshStandardMaterial color="#cccccc" metalness={0.3} roughness={0.6} />
         </mesh>
-        {/* Legs */}
-        <mesh position={[-0.1, 0.4, 0]}>
-          <capsuleGeometry args={[0.08, 0.4, 8, 16]} />
-          <meshStandardMaterial color="#ffffff" />
-        </mesh>
-        <mesh position={[0.1, 0.4, 0]}>
-          <capsuleGeometry args={[0.08, 0.4, 8, 16]} />
-          <meshStandardMaterial color="#ffffff" />
-        </mesh>
+        {/* Legs with animation refs */}
+        <group ref={leftLegRef} position={[-0.1, 0.4, 0]}>
+          <mesh>
+            <capsuleGeometry args={[0.08, 0.4, 8, 16]} />
+            <meshStandardMaterial color="#ffffff" />
+          </mesh>
+          {/* Boot */}
+          <mesh position={[0, -0.25, 0.05]}>
+            <boxGeometry args={[0.1, 0.1, 0.18]} />
+            <meshStandardMaterial color="#ff6b35" />
+          </mesh>
+        </group>
+        <group ref={rightLegRef} position={[0.1, 0.4, 0]}>
+          <mesh>
+            <capsuleGeometry args={[0.08, 0.4, 8, 16]} />
+            <meshStandardMaterial color="#ffffff" />
+          </mesh>
+          {/* Boot */}
+          <mesh position={[0, -0.25, 0.05]}>
+            <boxGeometry args={[0.1, 0.1, 0.18]} />
+            <meshStandardMaterial color="#ff6b35" />
+          </mesh>
+        </group>
 
-        {/* Jetpack flames when landing or exiting */}
-        {(isExiting || showLandingFlames) && (
+        {/* Jetpack flames when landing, exiting, or running */}
+        {(isExiting || showLandingFlames || isRunning) && (
           <>
-            <pointLight position={[0, -0.5, 0]} color="#ff4400" intensity={5} distance={8} />
+            <pointLight
+              position={[0, -0.5, 0]}
+              color="#ff4400"
+              intensity={isRunning ? 2 : 5}
+              distance={isRunning ? 4 : 8}
+            />
             <mesh position={[0.08, 0.1, -0.2]}>
-              <coneGeometry args={[0.08, 0.6, 8]} />
+              <coneGeometry args={[isRunning ? 0.04 : 0.08, isRunning ? 0.3 : 0.6, 8]} />
               <meshBasicMaterial color="#ff6600" transparent opacity={0.9} />
             </mesh>
             <mesh position={[-0.08, 0.1, -0.2]}>
-              <coneGeometry args={[0.08, 0.6, 8]} />
+              <coneGeometry args={[isRunning ? 0.04 : 0.08, isRunning ? 0.3 : 0.6, 8]} />
               <meshBasicMaterial color="#ff6600" transparent opacity={0.9} />
             </mesh>
-            {/* Smoke trail */}
-            <mesh position={[0, -0.3, -0.2]}>
-              <sphereGeometry args={[0.15, 16, 16]} />
-              <meshBasicMaterial color="#888888" transparent opacity={0.5} />
-            </mesh>
+            {/* Smoke trail - only for landing/exiting */}
+            {!isRunning && (
+              <mesh position={[0, -0.3, -0.2]}>
+                <sphereGeometry args={[0.15, 16, 16]} />
+                <meshBasicMaterial color="#888888" transparent opacity={0.5} />
+              </mesh>
+            )}
           </>
         )}
       </group>

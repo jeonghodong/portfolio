@@ -177,7 +177,7 @@ export const planets: Planet[] = [
     name_ko: "달",
     size: 2.2,
     textureUrl: "/textures/planets/moon.jpg",
-    position: [0, 3, 8],
+    position: [0, 2, 6],
     rotationSpeed: 0.002,
     environment: {
       groundColor: "#9a9a9a",
@@ -194,7 +194,7 @@ export const planets: Planet[] = [
     name_ko: "수성",
     size: 2.5,
     textureUrl: "/textures/planets/mercury.jpg",
-    position: [-28, 8, -22],
+    position: [-20, 6, -16],
     rotationSpeed: 0.004,
     projectId: "1",
     environment: {
@@ -212,7 +212,7 @@ export const planets: Planet[] = [
     name_ko: "금성",
     size: 2.8,
     textureUrl: "/textures/planets/venus.jpg",
-    position: [-12, -10, 16],
+    position: [-9, -7, 12],
     rotationSpeed: 0.002,
     projectId: "2",
     environment: {
@@ -230,7 +230,7 @@ export const planets: Planet[] = [
     name_ko: "지구",
     size: 3.0,
     textureUrl: "/textures/planets/earth.jpg",
-    position: [8, 5, -12],
+    position: [6, 4, -9],
     rotationSpeed: 0.003,
     projectId: "3",
     environment: {
@@ -248,7 +248,7 @@ export const planets: Planet[] = [
     name_ko: "화성",
     size: 2.5,
     textureUrl: "/textures/planets/mars.jpg",
-    position: [24, -6, 8],
+    position: [18, -5, 6],
     rotationSpeed: 0.003,
     projectId: "4",
     environment: {
@@ -266,7 +266,7 @@ export const planets: Planet[] = [
     name_ko: "목성",
     size: 4.5,
     textureUrl: "/textures/planets/jupiter.jpg",
-    position: [32, 12, -30],
+    position: [24, 9, -22],
     rotationSpeed: 0.005,
     environment: {
       groundColor: "#d4a06a",
@@ -283,7 +283,7 @@ export const planets: Planet[] = [
     name_ko: "토성",
     size: 4.0,
     textureUrl: "/textures/planets/saturn.jpg",
-    position: [-24, -15, -38],
+    position: [-18, -11, -28],
     rotationSpeed: 0.004,
     hasRing: true,
     ringTextureUrl: "/textures/planets/saturn_ring.png",
@@ -302,7 +302,7 @@ export const planets: Planet[] = [
     name_ko: "천왕성",
     size: 2.8,
     textureUrl: "/textures/planets/uranus.jpg",
-    position: [18, -12, 28],
+    position: [14, -9, 20],
     rotationSpeed: 0.002,
     environment: {
       groundColor: "#64b5c4",
@@ -319,7 +319,7 @@ export const planets: Planet[] = [
     name_ko: "해왕성",
     size: 3.0,
     textureUrl: "/textures/planets/neptune.jpg",
-    position: [-8, 18, -45],
+    position: [-6, 13, -32],
     rotationSpeed: 0.002,
     environment: {
       groundColor: "#3464a4",

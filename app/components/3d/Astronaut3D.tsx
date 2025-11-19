@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useRef, useState } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface Astronaut3DProps {
@@ -17,76 +17,113 @@ export default function Astronaut3D({ targetPosition, isMoving, isLaunching = fa
   const floatOffset = useRef(0);
   const launchProgress = useRef(0);
   const targetRotation = useRef(new THREE.Quaternion());
+  const mousePosition = useRef(new THREE.Vector3(0, 0, 15));
+  const previousPosition = useRef(new THREE.Vector3(0, 0, 15));
+  const velocityRef = useRef(0);
+  const [isBoosterActive, setIsBoosterActive] = useState(false);
+
+  const { pointer, viewport } = useThree();
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
-    // Floating animation (disabled during launch)
-    floatOffset.current += delta * 2;
-    const floatY = isLaunching ? 0 : Math.sin(floatOffset.current) * 0.3;
-    const floatX = isLaunching ? 0 : Math.cos(floatOffset.current * 0.7) * 0.15;
+    // Enhanced floating animation (disabled during launch)
+    floatOffset.current += delta * 1.5;
 
-    // Smooth movement towards target
-    const target = new THREE.Vector3(...targetPosition);
-    // Position astronaut slightly in front of the planet - scale with planet size
-    const direction = target.clone().sub(currentPosition.current).normalize();
-    const baseOffset = 5 + targetPlanetSize * 2; // Bigger planets = further distance
-    const offsetDistance = isLaunching ? 0 : baseOffset;
-    const finalTarget = target.clone().sub(direction.multiplyScalar(offsetDistance));
+    // Multi-layered floating for realistic zero-gravity effect
+    const floatY = isLaunching ? 0 :
+      Math.sin(floatOffset.current) * 0.4 +
+      Math.sin(floatOffset.current * 1.7) * 0.15;
+    const floatX = isLaunching ? 0 :
+      Math.cos(floatOffset.current * 0.7) * 0.2 +
+      Math.sin(floatOffset.current * 1.3) * 0.1;
+    const floatZ = isLaunching ? 0 :
+      Math.sin(floatOffset.current * 0.5) * 0.15;
+
+    // Calculate mouse position in 3D space
+    const mouseX = (pointer.x * viewport.width) / 2;
+    const mouseY = (pointer.y * viewport.height) / 2;
+    mousePosition.current.set(mouseX * 1.5, mouseY * 1.5, 15);
+
+    // Determine target based on state
+    let finalTarget: THREE.Vector3;
+
+    if (isLaunching) {
+      // Go to planet during launch
+      const target = new THREE.Vector3(...targetPosition);
+      finalTarget = target;
+    } else {
+      // Always follow mouse cursor
+      finalTarget = mousePosition.current.clone();
+    }
+
+    // Store previous position for velocity calculation
+    previousPosition.current.copy(currentPosition.current);
 
     if (isLaunching) {
       // Rocket launch - accelerate quickly toward planet
       launchProgress.current += delta * 3;
-      const speed = launchProgress.current * launchProgress.current * 5; // Accelerating
+      const speed = launchProgress.current * launchProgress.current * 5;
       currentPosition.current.lerp(finalTarget, Math.min(speed * delta, 0.3));
 
       // Wobble during launch
       groupRef.current.rotation.z = Math.sin(launchProgress.current * 15) * 0.15;
-    } else if (isMoving) {
-      currentPosition.current.lerp(finalTarget, delta * 2);
-      launchProgress.current = 0; // Reset launch progress
+    } else {
+      // Smooth follow mouse with gentle lerp
+      currentPosition.current.lerp(finalTarget, delta * 3);
+      launchProgress.current = 0;
+    }
+
+    // Calculate velocity for booster effect
+    const moved = currentPosition.current.distanceTo(previousPosition.current);
+    velocityRef.current = moved / delta;
+
+    // Activate booster when moving fast enough or launching
+    const shouldBoost = velocityRef.current > 0.5 || isLaunching;
+    if (shouldBoost !== isBoosterActive) {
+      setIsBoosterActive(shouldBoost);
     }
 
     // Apply position with floating
     groupRef.current.position.set(
       currentPosition.current.x + floatX,
       currentPosition.current.y + floatY,
-      currentPosition.current.z
+      currentPosition.current.z + floatZ
     );
 
-    // Rotate to face target without flipping
-    if (isMoving || isLaunching) {
-      const lookTarget = new THREE.Vector3(...targetPosition);
-      const lookDirection = lookTarget.clone().sub(groupRef.current.position).normalize();
+    // Rotate to face movement direction
+    const lookDirection = finalTarget.clone().sub(groupRef.current.position).normalize();
 
-      // Create rotation matrix that keeps "up" aligned with world Y
-      const rotMatrix = new THREE.Matrix4();
-      const up = new THREE.Vector3(0, 1, 0);
+    // Create rotation matrix that keeps "up" aligned with world Y
+    const rotMatrix = new THREE.Matrix4();
+    const up = new THREE.Vector3(0, 1, 0);
 
-      // Only rotate around Y axis primarily
-      const flatDirection = new THREE.Vector3(lookDirection.x, 0, lookDirection.z).normalize();
+    // Only rotate around Y axis primarily
+    const flatDirection = new THREE.Vector3(lookDirection.x, 0, lookDirection.z).normalize();
 
-      if (flatDirection.length() > 0.001) {
-        rotMatrix.lookAt(
-          groupRef.current.position,
-          groupRef.current.position.clone().add(flatDirection),
-          up
-        );
-        targetRotation.current.setFromRotationMatrix(rotMatrix);
+    if (flatDirection.length() > 0.001) {
+      rotMatrix.lookAt(
+        groupRef.current.position,
+        groupRef.current.position.clone().add(flatDirection),
+        up
+      );
+      targetRotation.current.setFromRotationMatrix(rotMatrix);
 
-        // Smooth rotation interpolation
-        groupRef.current.quaternion.slerp(targetRotation.current, delta * 3);
-      }
+      // Smooth rotation interpolation
+      groupRef.current.quaternion.slerp(targetRotation.current, delta * 3);
     }
 
-    // Subtle rotation animation (disabled during launch)
+    // Subtle rotation animation for realistic floating (disabled during launch)
     if (!isLaunching) {
-      groupRef.current.rotation.z = Math.sin(floatOffset.current * 0.5) * 0.1;
+      // Multi-axis gentle rotation for zero-gravity feel
+      groupRef.current.rotation.x = Math.sin(floatOffset.current * 0.3) * 0.08;
+      groupRef.current.rotation.z = Math.sin(floatOffset.current * 0.5) * 0.1 +
+        Math.cos(floatOffset.current * 0.8) * 0.05;
     }
   });
 
   return (
-    <group ref={groupRef} scale={0.7}>
+    <group ref={groupRef} scale={1.0}>
       {/* Helmet (head) */}
       <mesh position={[0, 1.2, 0]}>
         <sphereGeometry args={[0.5, 32, 32]} />
@@ -154,7 +191,7 @@ export default function Astronaut3D({ targetPosition, isMoving, isLaunching = fa
       </mesh>
 
       {/* Jetpack flames when moving */}
-      {(isMoving || isLaunching) && (
+      {isBoosterActive && (
         <>
           <pointLight
             position={[0, -1.5, -0.5]}
