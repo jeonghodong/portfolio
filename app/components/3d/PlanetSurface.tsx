@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -20,6 +20,9 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
   const particlesRef = useRef<THREE.Points>(null);
   const astronautRef = useRef<THREE.Group>(null);
   const exitProgress = useRef(0);
+  const landingProgress = useRef(0);
+  const isLandingRef = useRef(true);
+  const [showLandingFlames, setShowLandingFlames] = useState(true);
   const { language } = useLanguage();
 
   // Generate terrain particles/dust
@@ -88,7 +91,7 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
     return hillData;
   }, []);
 
-  // Animate particles and astronaut exit
+  // Animate particles and astronaut landing/exit
   useFrame((state, delta) => {
     if (particlesRef.current) {
       particlesRef.current.rotation.y = state.clock.elapsedTime * 0.02;
@@ -101,8 +104,36 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
       particlesRef.current.geometry.attributes.position.needsUpdate = true;
     }
 
+    // Astronaut landing animation - descend from above
+    if (isLandingRef.current && astronautRef.current && !isExiting) {
+      landingProgress.current += delta * 1.5;
+
+      // Start from high up and descend
+      const startHeight = 15;
+      const targetHeight = 0;
+
+      // Decelerate as approaching ground (easing out)
+      const t = Math.min(landingProgress.current / 2, 1);
+      const easedT = 1 - Math.pow(1 - t, 3); // Ease out cubic
+      const currentHeight = startHeight - (startHeight - targetHeight) * easedT;
+
+      astronautRef.current.position.y = currentHeight;
+
+      // Wobble during descent
+      astronautRef.current.rotation.z = Math.sin(landingProgress.current * 8) * 0.15 * (1 - easedT);
+
+      // Landing complete
+      if (t >= 1) {
+        isLandingRef.current = false;
+        setShowLandingFlames(false);
+        astronautRef.current.position.y = 0;
+        astronautRef.current.rotation.z = 0;
+      }
+    }
+
     // Astronaut exit animation - rocket launch!
     if (isExiting && astronautRef.current) {
+      isLandingRef.current = false;
       exitProgress.current += delta * 2;
       // Accelerate upwards like a rocket
       const height = exitProgress.current * exitProgress.current * 3;
@@ -267,8 +298,8 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
           <meshStandardMaterial color="#ffffff" />
         </mesh>
 
-        {/* Jetpack flames when exiting */}
-        {isExiting && (
+        {/* Jetpack flames when landing or exiting */}
+        {(isExiting || showLandingFlames) && (
           <>
             <pointLight position={[0, -0.5, 0]} color="#ff4400" intensity={5} distance={8} />
             <mesh position={[0.08, 0.1, -0.2]}>

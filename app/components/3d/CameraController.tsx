@@ -7,9 +7,10 @@ import * as THREE from 'three';
 interface CameraControllerProps {
   targetPosition: [number, number, number] | null;
   isActive: boolean;
+  isEntering?: boolean;
 }
 
-export default function CameraController({ targetPosition, isActive }: CameraControllerProps) {
+export default function CameraController({ targetPosition, isActive, isEntering = false }: CameraControllerProps) {
   const { camera } = useThree();
   const defaultPosition = useRef(new THREE.Vector3(0, 5, 35));
   const currentTarget = useRef(new THREE.Vector3(0, 0, 0));
@@ -17,6 +18,17 @@ export default function CameraController({ targetPosition, isActive }: CameraCon
   const returningToDefault = useRef(false);
 
   useFrame(() => {
+    // When entering a planet - zoom in dramatically
+    if (isEntering && targetPosition) {
+      const target = new THREE.Vector3(...targetPosition);
+
+      // Move camera very close to the planet center
+      camera.position.lerp(target, 0.08);
+      currentTarget.current.lerp(target, 0.1);
+      camera.lookAt(currentTarget.current);
+      return;
+    }
+
     // Only move camera when a planet is selected
     if (isActive && targetPosition) {
       wasActive.current = true;

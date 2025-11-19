@@ -265,6 +265,7 @@ export default function Scene() {
               <CameraController
                 targetPosition={hoveredPlanet?.position || null}
                 isActive={hoveredPlanetId !== null && !isTransitioning}
+                isEntering={isTransitioning}
               />
 
               <ambientLight intensity={0.4} color="#ffffff" />
