@@ -6,7 +6,7 @@ import * as THREE from 'three';
 
 // Shooting star component
 function ShootingStar({ onComplete }: { onComplete: () => void }) {
-  const lineRef = useRef<THREE.Line>(null);
+  const lineRef = useRef<THREE.Line | null>(null);
   const progressRef = useRef(0);
 
   // Random starting position and direction
@@ -24,6 +24,22 @@ function ShootingStar({ onComplete }: { onComplete: () => void }) {
     const length = 3 + Math.random() * 4;
 
     return { startX, startY, startZ, dirX, dirY, dirZ, speed, length };
+  }, []);
+
+  // Create line object
+  const lineObject = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(6);
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const mat = new THREE.LineBasicMaterial({
+      color: '#ffffff',
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+    });
+
+    return new THREE.Line(geo, mat);
   }, []);
 
   useFrame((state, delta) => {
@@ -58,22 +74,13 @@ function ShootingStar({ onComplete }: { onComplete: () => void }) {
     }
   });
 
-  const geometry = useMemo(() => {
-    const geo = new THREE.BufferGeometry();
-    const positions = new Float32Array(6);
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    return geo;
-  }, []);
-
   return (
-    <line ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial
-        color="#ffffff"
-        transparent
-        opacity={0.8}
-        blending={THREE.AdditiveBlending}
-      />
-    </line>
+    <primitive
+      object={lineObject}
+      ref={(obj: THREE.Line | null) => {
+        lineRef.current = obj;
+      }}
+    />
   );
 }
 

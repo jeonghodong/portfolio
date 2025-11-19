@@ -95,7 +95,7 @@ function SpaceXSign() {
 
 interface PlanetSurfaceProps {
   planet: Planet;
-  project: Project;
+  project: Project | null;
   onFlagClick: () => void;
   onBack: () => void;
   isExiting: boolean;
@@ -407,13 +407,15 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
         />
       </points>
 
-      {/* Flag with project */}
-      <Flag3D
-        position={[0, 0, -5]}
-        onClick={onFlagClick}
-        planetName={language === 'ko' ? planet.name_ko : planet.name}
-        projectTitle={language === 'ko' ? project.title_ko : project.title_en}
-      />
+      {/* Flag with project (only shown if project exists) */}
+      {project && (
+        <Flag3D
+          position={[0, 0, -5]}
+          onClick={onFlagClick}
+          planetName={language === 'ko' ? planet.name_ko : planet.name}
+          projectTitle={language === 'ko' ? project.title_ko : project.title_en}
+        />
+      )}
 
       {/* Easter Eggs based on planet */}
       {planet.name === 'Mars' && (

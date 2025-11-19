@@ -76,3 +76,16 @@ export interface Planet {
   ringTextureUrl?: string;
   environment: PlanetEnvironment;
 }
+
+export interface Capsule {
+  id: string;
+  projectId: string;
+  position: [number, number, number];
+  size: number;
+  color: string;
+  glowColor: string;
+  targetPlanetId: string;
+  label: string;
+  label_ko: string;
+  label_en: string;
+}

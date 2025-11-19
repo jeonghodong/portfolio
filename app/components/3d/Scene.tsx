@@ -4,27 +4,30 @@ import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import SpaceBackground from "./SpaceBackground";
-import PlanetSystem from "./PlanetSystem";
+import ShipInteriorEnvironment from "./ShipInteriorEnvironment";
+import SpaceshipInterior from "./SpaceshipInterior";
 import PlanetSurface from "./PlanetSurface";
 import CameraController from "./CameraController";
+import CapsulePortal from "./CapsulePortal";
 import CardDetailContent from "../ui/CardDetailContent";
 import LanguageToggle from "../ui/LanguageToggle";
-import type { Project, Planet } from "@/app/types";
-import { planets, projects } from "@/app/lib/data";
+import type { Project, Planet, Capsule } from "@/app/types";
+import { planets, projects, capsules } from "@/app/lib/data";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 
-type SceneMode = 'space' | 'surface';
+type SceneMode = 'spaceship' | 'surface';
 
 export default function Scene() {
-  const [sceneMode, setSceneMode] = useState<SceneMode>('space');
+  const [sceneMode, setSceneMode] = useState<SceneMode>('spaceship');
   const [currentPlanet, setCurrentPlanet] = useState<Planet | null>(null);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [hoveredPlanetId, setHoveredPlanetId] = useState<string | null>(null);
+  const [selectedCapsuleId, setSelectedCapsuleId] = useState<string | null>(null);
+  const [hoveredCapsuleId, setHoveredCapsuleId] = useState<string | null>(null);
+  const [isPortalActive, setIsPortalActive] = useState(false);
   const [isCameraZooming, setIsCameraZooming] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -54,55 +57,71 @@ export default function Scene() {
         if (selectedProject) {
           setSelectedProject(null);
         } else if (sceneMode === 'surface' && !isExiting) {
-          handleBackToSpace();
-        } else if (sceneMode === 'space' && hoveredPlanetId) {
-          // Deselect planet in space mode
-          setHoveredPlanetId(null);
+          handleBackToShip();
+        } else if (sceneMode === 'spaceship' && selectedCapsuleId) {
+          setSelectedCapsuleId(null);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sceneMode, selectedProject, isExiting, hoveredPlanetId]);
+  }, [sceneMode, selectedProject, isExiting, selectedCapsuleId]);
 
-  const handlePlanetEnter = (planetId: string) => {
-    const planet = planets.find(p => p.id === planetId);
-    if (!planet?.projectId) return;
+  // Get selected capsule info
+  const selectedCapsule = selectedCapsuleId
+    ? capsules.find(c => c.id === selectedCapsuleId)
+    : null;
 
-    const project = projects.find(p => p.id === planet.projectId);
-    if (!project) return;
+  const handleCapsuleSelect = (capsuleId: string) => {
+    setSelectedCapsuleId(capsuleId);
+    setHoveredCapsuleId(capsuleId);
+  };
 
-    // Step 1: Astronaut starts flying to planet
-    setIsTransitioning(true);
+  const handleCapsuleEnter = (capsuleId: string) => {
+    const capsule = capsules.find(c => c.id === capsuleId);
+    if (!capsule) return;
+
+    const planet = planets.find(p => p.id === capsule.targetPlanetId);
+    if (!planet) return;
+
+    // Find project if exists (some planets don't have projects)
+    const project = capsule.projectId
+      ? projects.find(p => p.id === capsule.projectId) || null
+      : null;
+
+    // Start portal animation
+    setIsPortalActive(true);
     setCurrentPlanet(planet);
     setCurrentProject(project);
 
-    // Step 2: After astronaut moves, camera starts zooming
+    // Camera starts zooming into portal
     setTimeout(() => {
       setIsCameraZooming(true);
-    }, 400);
+    }, 300);
 
-    // Step 3: Transition to surface after both animations
+    // Transition to surface
     setTimeout(() => {
       setSceneMode('surface');
+      setIsPortalActive(false);
       setIsTransitioning(false);
       setIsCameraZooming(false);
-      setHoveredPlanetId(null);
-    }, 1200);
+      setSelectedCapsuleId(null);
+      setHoveredCapsuleId(null);
+    }, 1000);
   };
 
-  const handleBackToSpace = () => {
+  const handleBackToShip = () => {
     // Start exit animation
     setIsExiting(true);
 
-    // After astronaut launches, transition to space
+    // After astronaut launches, transition to ship
     setTimeout(() => {
       setIsTransitioning(true);
     }, 1000);
 
     setTimeout(() => {
-      setSceneMode('space');
+      setSceneMode('spaceship');
       setCurrentPlanet(null);
       setCurrentProject(null);
       setIsTransitioning(false);
@@ -120,13 +139,13 @@ export default function Scene() {
     setSelectedProject(null);
   };
 
-  // Get hovered planet info for preview
-  const hoveredPlanet = hoveredPlanetId
-    ? planets.find(p => p.id === hoveredPlanetId)
+  // Get hovered capsule info for preview
+  const hoveredCapsule = hoveredCapsuleId
+    ? capsules.find(c => c.id === hoveredCapsuleId)
     : null;
 
-  const hoveredProject = hoveredPlanet?.projectId
-    ? projects.find(p => p.id === hoveredPlanet.projectId)
+  const hoveredProject = hoveredCapsule?.projectId
+    ? projects.find(p => p.id === hoveredCapsule.projectId)
     : null;
 
   return (
@@ -138,15 +157,15 @@ export default function Scene() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[100] bg-[#020010] flex flex-col items-center justify-center"
+            className="fixed inset-0 z-[100] bg-[#0a0a1e] flex flex-col items-center justify-center"
           >
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full mb-4"
+              className="w-16 h-16 border-4 border-white/20 border-t-blue-400 rounded-full mb-4"
             />
             <p className="text-white/80 text-lg">
-              {language === 'ko' ? '우주 로딩 중...' : 'Loading Space...'}
+              {language === 'ko' ? '우주선 부팅 중...' : 'Initializing Spaceship...'}
             </p>
           </motion.div>
         )}
@@ -161,33 +180,44 @@ export default function Scene() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
-          onClick={handleBackToSpace}
+          onClick={handleBackToShip}
           className="fixed top-6 left-6 z-30 bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-black/70 transition-colors flex items-center gap-2"
-          aria-label={language === 'ko' ? '우주로 돌아가기' : 'Back to Space'}
+          aria-label={language === 'ko' ? '우주선으로 복귀' : 'Return to Ship'}
         >
           <span aria-hidden="true">←</span>
-          <span>{language === 'ko' ? '우주로 돌아가기' : 'Back to Space'}</span>
+          <span>{language === 'ko' ? '우주선으로 복귀' : 'Return to Ship'}</span>
         </motion.button>
       )}
 
-      {/* Guide message for space mode */}
-      {sceneMode === 'space' && !isTransitioning && !hoveredPlanetId && (
+      {/* Guide message for spaceship mode */}
+      {sceneMode === 'spaceship' && !isPortalActive && !selectedCapsuleId && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="fixed top-6 left-1/2 -translate-x-1/2 z-30 text-white/90 text-lg font-medium tracking-wide"
           role="status"
         >
-          <span className="bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
+          <span className="bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-blue-500/30">
             {language === 'ko'
-              ? (isMobile ? '🪐 행성을 탭하여 탐험해보세요!' : '🪐 행성을 클릭하여 탐험해보세요!')
-              : (isMobile ? '🪐 Tap a planet to explore!' : '🪐 Click a planet to explore!')}
+              ? (isMobile ? '🚀 로켓을 탭하여 행성으로 이동!' : '🚀 로켓을 클릭하여 행성으로 이동!')
+              : (isMobile ? '🚀 Tap a rocket to travel to planet!' : '🚀 Click a rocket to travel to planet!')}
           </span>
         </motion.div>
       )}
 
-      {/* Launch indicator when entering or exiting */}
-      {(isExiting || isTransitioning) && (
+      {/* Portal activation indicator */}
+      {isPortalActive && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-white text-2xl font-bold tracking-widest"
+        >
+          {language === 'ko' ? '🚀 발사!' : '🚀 Launching!'}
+        </motion.div>
+      )}
+
+      {/* Exit indicator */}
+      {isExiting && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -217,18 +247,18 @@ export default function Scene() {
         role="status"
         aria-live="polite"
       >
-        {sceneMode === 'space'
+        {sceneMode === 'spaceship'
           ? (language === 'ko'
-            ? (isMobile ? "드래그하여 탐색 • 행성 탭하여 선택 • 다시 탭하여 진입" : "드래그하여 탐색 • 행성 클릭하여 선택 • 다시 클릭하여 진입")
-            : (isMobile ? "Drag to explore • Tap planet to select • Tap again to enter" : "Drag to explore • Click planet to select • Click again to enter"))
+            ? (isMobile ? "드래그하여 탐색 • 로켓 탭하여 선택 • 다시 탭하여 발사" : "드래그하여 탐색 • 로켓 클릭하여 선택 • 다시 클릭하여 발사")
+            : (isMobile ? "Drag to explore • Tap rocket to select • Tap again to launch" : "Drag to explore • Click rocket to select • Click again to launch"))
           : (language === 'ko'
-            ? (isMobile ? "드래그하여 주변 탐색 • 깃발 탭하여 프로젝트 보기" : "드래그하여 주변 탐색 • 깃발 클릭하여 프로젝트 보기 • ESC로 우주 복귀")
+            ? (isMobile ? "드래그하여 주변 탐색 • 깃발 탭하여 프로젝트 보기" : "드래그하여 주변 탐색 • 깃발 클릭하여 프로젝트 보기 • ESC로 우주선 복귀")
             : (isMobile ? "Drag to look around • Tap flag to view project" : "Drag to look around • Click flag to view project • ESC to return"))}
       </div>
 
-      {/* Project Preview Panel - space mode only */}
+      {/* Project Preview Panel - spaceship mode only */}
       <AnimatePresence>
-        {sceneMode === 'space' && hoveredProject && !isTransitioning && (
+        {sceneMode === 'spaceship' && hoveredProject && !isPortalActive && (
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -236,11 +266,14 @@ export default function Scene() {
             transition={{ duration: 0.3 }}
             className="fixed right-6 top-1/2 -translate-y-1/2 z-30 w-80 max-w-[calc(100vw-3rem)]"
           >
-            <div className="bg-black/70 backdrop-blur-md rounded-xl p-5 border border-white/10">
+            <div className="bg-black/70 backdrop-blur-md rounded-xl p-5 border border-blue-500/20">
               <div className="flex items-center gap-2 mb-3">
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <span
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ backgroundColor: hoveredCapsule?.glowColor }}
+                />
                 <span className="text-white/60 text-sm">
-                  {hoveredPlanet?.name_ko} • {hoveredPlanet?.name}
+                  {language === 'ko' ? hoveredCapsule?.label_ko : hoveredCapsule?.label_en}
                 </span>
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
@@ -261,10 +294,10 @@ export default function Scene() {
                   </span>
                 )}
               </div>
-              <div className="text-center text-white/50 text-xs">
+              <div className="text-center text-blue-400/80 text-xs">
                 {language === 'ko'
-                  ? (isMobile ? "다시 탭하여 탐사 시작" : "다시 클릭하여 탐사 시작")
-                  : (isMobile ? "Tap again to start exploration" : "Click again to start exploration")}
+                  ? (isMobile ? "다시 탭하여 발사" : "다시 클릭하여 발사")
+                  : (isMobile ? "Tap again to launch" : "Click again to launch")}
               </div>
             </div>
           </motion.div>
@@ -286,7 +319,7 @@ export default function Scene() {
               style={{
                 background: currentPlanet
                   ? `radial-gradient(circle, ${currentPlanet.environment.ambientColor} 0%, ${currentPlanet.environment.fogColor} 50%, transparent 70%)`
-                  : `radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(100,150,255,0.6) 50%, transparent 70%)`,
+                  : `radial-gradient(circle, rgba(100,150,255,0.8) 0%, rgba(50,100,200,0.6) 50%, transparent 70%)`,
               }}
             />
           </motion.div>
@@ -299,67 +332,64 @@ export default function Scene() {
           gl={{ antialias: true, alpha: true }}
           dpr={[1, isMobile ? 1.5 : 2]}
           onPointerMissed={() => {
-            if (sceneMode === 'space' && hoveredPlanetId && !isTransitioning) {
-              setHoveredPlanetId(null);
+            if (sceneMode === 'spaceship' && selectedCapsuleId && !isPortalActive) {
+              setSelectedCapsuleId(null);
+              setHoveredCapsuleId(null);
             }
           }}
         >
-          {sceneMode === 'space' ? (
+          {sceneMode === 'spaceship' ? (
             <>
-              <color attach="background" args={['#020010']} />
-              <fog attach="fog" args={['#020010', 80, 250]} />
+              <color attach="background" args={['#0a0a1e']} />
 
-              <PerspectiveCamera makeDefault position={[0, 5, 35]} fov={60} />
+              <PerspectiveCamera makeDefault position={[0, 4, 10]} fov={60} />
 
               <CameraController
-                targetPosition={hoveredPlanet?.position || null}
-                isActive={hoveredPlanetId !== null && !isTransitioning}
+                targetPosition={selectedCapsule?.position || null}
+                isActive={selectedCapsuleId !== null && !isPortalActive}
                 isEntering={isCameraZooming}
-                targetPlanetSize={hoveredPlanet?.size || 1}
+                targetSize={selectedCapsule?.size || 1}
+                mode="spaceship"
               />
 
-              <ambientLight intensity={0.4} color="#ffffff" />
-              <directionalLight position={[50, 30, 50]} intensity={1.5} color="#fff5e0" castShadow />
-              <pointLight position={[-30, -20, -30]} intensity={0.4} color="#4488ff" />
-              <pointLight position={[20, -10, 20]} intensity={0.3} color="#ff8844" />
-              <directionalLight position={[-30, 10, -20]} intensity={0.5} color="#88aaff" />
-
               <Suspense fallback={null}>
-                <SpaceBackground />
-                <PlanetSystem
-                  onPlanetSelect={() => {}}
-                  selectedProject={null}
-                  onPlanetEnter={handlePlanetEnter}
-                  hoveredPlanetId={hoveredPlanetId}
-                  onPlanetHover={setHoveredPlanetId}
-                  isMobile={isMobile}
-                  isLaunching={isTransitioning}
+                <ShipInteriorEnvironment />
+                <SpaceshipInterior
+                  selectedCapsuleId={selectedCapsuleId}
+                  hoveredCapsuleId={hoveredCapsuleId}
+                  onCapsuleSelect={handleCapsuleSelect}
+                  onCapsuleHover={setHoveredCapsuleId}
+                  onCapsuleEnter={handleCapsuleEnter}
+                />
+                <CapsulePortal
+                  isActive={isPortalActive}
+                  capsule={selectedCapsule || null}
                 />
               </Suspense>
 
-              {/* Space exploration controls */}
+              {/* Spaceship interior controls */}
               <OrbitControls
                 enableZoom={true}
-                enablePan={true}
+                enablePan={false}
                 enableRotate={true}
                 zoomSpeed={0.5}
-                panSpeed={0.5}
                 rotateSpeed={0.3}
-                minDistance={10}
-                maxDistance={100}
-                maxPolarAngle={Math.PI * 0.85}
-                minPolarAngle={Math.PI * 0.15}
+                minDistance={6}
+                maxDistance={20}
+                maxPolarAngle={Math.PI * 0.7}
+                minPolarAngle={Math.PI * 0.2}
+                target={[0, 0, -3]}
               />
             </>
           ) : (
             <>
-              {currentPlanet && currentProject && (
+              {currentPlanet && (
                 <Suspense fallback={null}>
                   <PlanetSurface
                     planet={currentPlanet}
                     project={currentProject}
                     onFlagClick={handleFlagClick}
-                    onBack={handleBackToSpace}
+                    onBack={handleBackToShip}
                     isExiting={isExiting}
                   />
                 </Suspense>
