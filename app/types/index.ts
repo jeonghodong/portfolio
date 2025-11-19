@@ -54,6 +54,15 @@ export interface SectionAudio {
   contact?: string;
 }
 
+export interface PlanetEnvironment {
+  groundColor: string;
+  skyColor: string;
+  fogColor: string;
+  ambientColor: string;
+  particleColor: string;
+  features: string[]; // e.g., ['craters', 'dust', 'rocks']
+}
+
 export interface Planet {
   id: string;
   name: string;
@@ -65,4 +74,5 @@ export interface Planet {
   projectId?: string;
   hasRing?: boolean;
   ringTextureUrl?: string;
+  environment: PlanetEnvironment;
 }

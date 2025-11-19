@@ -13,6 +13,7 @@ interface PlanetSystemProps {
   hoveredPlanetId: string | null;
   onPlanetHover: (planetId: string | null) => void;
   isMobile: boolean;
+  isLaunching?: boolean;
 }
 
 export default function PlanetSystem({
@@ -22,6 +23,7 @@ export default function PlanetSystem({
   hoveredPlanetId,
   onPlanetHover,
   isMobile,
+  isLaunching = false,
 }: PlanetSystemProps) {
   const hoveredPlanet = hoveredPlanetId
     ? planets.find(p => p.id === hoveredPlanetId)
@@ -62,6 +64,7 @@ export default function PlanetSystem({
       <Astronaut3D
         targetPosition={targetPosition}
         isMoving={hoveredPlanetId !== null}
+        isLaunching={isLaunching}
       />
 
       {/* Planets */}

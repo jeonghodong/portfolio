@@ -180,6 +180,14 @@ export const planets: Planet[] = [
     position: [-18, 5, -15],
     rotationSpeed: 0.004,
     projectId: "1",
+    environment: {
+      groundColor: "#8a8a8a",
+      skyColor: "#1a1a1a",
+      fogColor: "#2a2a2a",
+      ambientColor: "#ffffff",
+      particleColor: "#cccccc",
+      features: ["craters", "dust", "rocks"],
+    },
   },
   {
     id: "2",
@@ -190,6 +198,14 @@ export const planets: Planet[] = [
     position: [-8, -6, 10],
     rotationSpeed: 0.002,
     projectId: "2",
+    environment: {
+      groundColor: "#d4a574",
+      skyColor: "#ff8c42",
+      fogColor: "#ffa64d",
+      ambientColor: "#ffcc99",
+      particleColor: "#ffdd88",
+      features: ["clouds", "volcanic", "haze"],
+    },
   },
   {
     id: "3",
@@ -200,6 +216,14 @@ export const planets: Planet[] = [
     position: [5, 3, -8],
     rotationSpeed: 0.003,
     projectId: "3",
+    environment: {
+      groundColor: "#4a7c4e",
+      skyColor: "#87ceeb",
+      fogColor: "#b0d4e8",
+      ambientColor: "#ffffff",
+      particleColor: "#88ff88",
+      features: ["grass", "trees", "water"],
+    },
   },
   {
     id: "4",
@@ -210,6 +234,14 @@ export const planets: Planet[] = [
     position: [15, -4, 5],
     rotationSpeed: 0.003,
     projectId: "4",
+    environment: {
+      groundColor: "#c1440e",
+      skyColor: "#e8a87c",
+      fogColor: "#d4916a",
+      ambientColor: "#ffccaa",
+      particleColor: "#ff6644",
+      features: ["rocks", "sand", "dust"],
+    },
   },
   {
     id: "5",
@@ -219,6 +251,14 @@ export const planets: Planet[] = [
     textureUrl: "/textures/planets/jupiter.jpg",
     position: [20, 8, -20],
     rotationSpeed: 0.005,
+    environment: {
+      groundColor: "#d4a06a",
+      skyColor: "#c4956a",
+      fogColor: "#e8c4a0",
+      ambientColor: "#ffddbb",
+      particleColor: "#ffaa66",
+      features: ["clouds", "storms", "gas"],
+    },
   },
   {
     id: "6",
@@ -230,6 +270,14 @@ export const planets: Planet[] = [
     rotationSpeed: 0.004,
     hasRing: true,
     ringTextureUrl: "/textures/planets/saturn_ring.png",
+    environment: {
+      groundColor: "#e8d4a0",
+      skyColor: "#f4e8c4",
+      fogColor: "#fff0d4",
+      ambientColor: "#ffffee",
+      particleColor: "#ffee88",
+      features: ["rings", "clouds", "wind"],
+    },
   },
   {
     id: "7",
@@ -239,6 +287,14 @@ export const planets: Planet[] = [
     textureUrl: "/textures/planets/uranus.jpg",
     position: [12, -8, 18],
     rotationSpeed: 0.002,
+    environment: {
+      groundColor: "#64b5c4",
+      skyColor: "#88d4e4",
+      fogColor: "#a4e4f0",
+      ambientColor: "#ccffff",
+      particleColor: "#88ffff",
+      features: ["ice", "fog", "crystals"],
+    },
   },
   {
     id: "8",
@@ -248,5 +304,13 @@ export const planets: Planet[] = [
     textureUrl: "/textures/planets/neptune.jpg",
     position: [-5, 12, -30],
     rotationSpeed: 0.002,
+    environment: {
+      groundColor: "#3464a4",
+      skyColor: "#4488cc",
+      fogColor: "#5599dd",
+      ambientColor: "#aaddff",
+      particleColor: "#66aaff",
+      features: ["storms", "wind", "ice"],
+    },
   },
 ];
