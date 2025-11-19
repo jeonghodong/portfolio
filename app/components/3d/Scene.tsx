@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ParticleBackground from "./ParticleBackground";
 import CardStack from "./CardStack";
 import CardDetailContent from "../ui/CardDetailContent";
+import LanguageToggle from "../ui/LanguageToggle";
 import type { Project } from "@/app/types";
 
 export default function Scene() {
@@ -138,6 +139,9 @@ export default function Scene() {
 
   return (
     <>
+      {/* Language Toggle */}
+      <LanguageToggle />
+
       <div ref={canvasContainerRef} className="fixed inset-0">
         <Canvas
           gl={{ antialias: true, alpha: true }}
@@ -209,11 +213,11 @@ export default function Scene() {
                 stiffness: 300,
                 delay: 0.1,
               }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+              style={{ padding: '60px' }}
             >
               <div
-                className="pointer-events-auto"
-                style={{ width: "750px", height: "650px" }}
+                className="pointer-events-auto w-full max-w-[750px] h-full max-h-[650px]"
               >
                 <CardDetailContent
                   project={selectedProject}

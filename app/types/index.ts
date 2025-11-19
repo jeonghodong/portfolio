@@ -13,8 +13,16 @@ export interface PersonalInfo {
 export interface Project {
   id: string;
   title: string;
+  title_ko: string;
+  title_en: string;
   description: string;
+  description_ko: string;
+  description_en: string;
   longDescription: string;
+  longDescription_ko: string;
+  longDescription_en: string;
+  period: string;
+  teamSize?: string;
   technologies: string[];
   demoUrl?: string;
   githubUrl?: string;

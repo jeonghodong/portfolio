@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RoundedBox, Text } from "@react-three/drei";
 import { useSpring, animated } from "@react-spring/three";
 import * as THREE from "three";
 import type { Project } from "@/app/types";
+import { useLanguage } from "@/app/contexts/LanguageContext";
 
 interface Card3DProps {
   project: Project;
@@ -28,9 +29,11 @@ export default function Card3D({
   isHovered,
   onHover,
   onClick,
-  onClose,
 }: Card3DProps) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const { language } = useLanguage();
+
+  const displayTitle = language === 'ko' ? project.title_ko : project.title_en;
 
   // Spring animation for selection
   // Modal size is ~900px, card is 2.5 units → scale to ~2.8 to match modal
@@ -104,7 +107,7 @@ export default function Card3D({
           maxWidth={3.4}
           textAlign="center"
         >
-          {project.title}
+          {displayTitle}
         </Text>
       )}
 
@@ -117,7 +120,7 @@ export default function Card3D({
           anchorX="center"
           anchorY="middle"
         >
-          ★ FEATURED
+          ★ {language === 'ko' ? '주요 프로젝트' : 'FEATURED'}
         </Text>
       )}
 
