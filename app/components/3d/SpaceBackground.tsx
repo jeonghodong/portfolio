@@ -1,8 +1,111 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+
+// Shooting star component
+function ShootingStar({ onComplete }: { onComplete: () => void }) {
+  const lineRef = useRef<THREE.Line>(null);
+  const progressRef = useRef(0);
+
+  // Random starting position and direction
+  const config = useMemo(() => {
+    const startX = (Math.random() - 0.5) * 200;
+    const startY = 50 + Math.random() * 50;
+    const startZ = -50 - Math.random() * 100;
+
+    // Direction: mostly downward and to the side
+    const dirX = (Math.random() - 0.5) * 2;
+    const dirY = -1 - Math.random() * 0.5;
+    const dirZ = Math.random() * 0.5;
+
+    const speed = 80 + Math.random() * 40;
+    const length = 3 + Math.random() * 4;
+
+    return { startX, startY, startZ, dirX, dirY, dirZ, speed, length };
+  }, []);
+
+  useFrame((state, delta) => {
+    if (!lineRef.current) return;
+
+    progressRef.current += delta * config.speed;
+
+    const positions = lineRef.current.geometry.attributes.position.array as Float32Array;
+
+    // Head position
+    const headX = config.startX + config.dirX * progressRef.current;
+    const headY = config.startY + config.dirY * progressRef.current;
+    const headZ = config.startZ + config.dirZ * progressRef.current;
+
+    // Tail position (behind the head)
+    const tailX = headX - config.dirX * config.length;
+    const tailY = headY - config.dirY * config.length;
+    const tailZ = headZ - config.dirZ * config.length;
+
+    positions[0] = tailX;
+    positions[1] = tailY;
+    positions[2] = tailZ;
+    positions[3] = headX;
+    positions[4] = headY;
+    positions[5] = headZ;
+
+    lineRef.current.geometry.attributes.position.needsUpdate = true;
+
+    // Remove when out of view
+    if (headY < -50) {
+      onComplete();
+    }
+  });
+
+  const geometry = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(6);
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    return geo;
+  }, []);
+
+  return (
+    <line ref={lineRef} geometry={geometry}>
+      <lineBasicMaterial
+        color="#ffffff"
+        transparent
+        opacity={0.8}
+        blending={THREE.AdditiveBlending}
+      />
+    </line>
+  );
+}
+
+// Shooting stars manager
+function ShootingStars() {
+  const [stars, setStars] = useState<number[]>([]);
+  const nextSpawnRef = useRef(Math.random() * 3);
+  const idCounterRef = useRef(0);
+
+  useFrame((state, delta) => {
+    nextSpawnRef.current -= delta;
+
+    if (nextSpawnRef.current <= 0) {
+      // Spawn new shooting star
+      setStars(prev => [...prev, idCounterRef.current++]);
+      // Next spawn in 2-6 seconds
+      nextSpawnRef.current = 2 + Math.random() * 4;
+    }
+  });
+
+  const handleComplete = (id: number) => {
+    setStars(prev => prev.filter(starId => starId !== id));
+  };
+
+  return (
+    <>
+      {stars.map(id => (
+        <ShootingStar key={id} onComplete={() => handleComplete(id)} />
+      ))}
+    </>
+  );
+}
 
 export default function SpaceBackground() {
   const starsRef = useRef<THREE.Points>(null);
@@ -115,90 +218,8 @@ export default function SpaceBackground() {
         />
       </points>
 
-      {/* Subtle nebula clouds */}
-      <mesh position={[30, 20, -80]}>
-        <sphereGeometry args={[25, 32, 32]} />
-        <meshBasicMaterial
-          color="#1a0a3e"
-          transparent
-          opacity={0.3}
-          side={THREE.BackSide}
-        />
-      </mesh>
-
-      <mesh position={[-40, -15, -100]}>
-        <sphereGeometry args={[30, 32, 32]} />
-        <meshBasicMaterial
-          color="#0a1a3e"
-          transparent
-          opacity={0.25}
-          side={THREE.BackSide}
-        />
-      </mesh>
-
-      <mesh position={[0, -40, -60]}>
-        <sphereGeometry args={[20, 32, 32]} />
-        <meshBasicMaterial
-          color="#2a0a2e"
-          transparent
-          opacity={0.2}
-          side={THREE.BackSide}
-        />
-      </mesh>
-
-      {/* Additional nebula details */}
-      <mesh position={[60, 10, -120]}>
-        <sphereGeometry args={[35, 32, 32]} />
-        <meshBasicMaterial
-          color="#3a0a1e"
-          transparent
-          opacity={0.2}
-          side={THREE.BackSide}
-        />
-      </mesh>
-
-      <mesh position={[-60, 30, -90]}>
-        <sphereGeometry args={[28, 32, 32]} />
-        <meshBasicMaterial
-          color="#0a2a3e"
-          transparent
-          opacity={0.25}
-          side={THREE.BackSide}
-        />
-      </mesh>
-
-      {/* Asteroid belt hints */}
-      {Array.from({ length: 30 }).map((_, i) => {
-        const angle = (i / 30) * Math.PI * 2;
-        const radius = 70 + Math.random() * 20;
-        const y = (Math.random() - 0.5) * 10;
-        return (
-          <mesh
-            key={`asteroid-${i}`}
-            position={[
-              Math.cos(angle) * radius,
-              y,
-              Math.sin(angle) * radius - 50
-            ]}
-            rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]}
-          >
-            <dodecahedronGeometry args={[0.3 + Math.random() * 0.5, 0]} />
-            <meshStandardMaterial color="#555555" roughness={0.9} />
-          </mesh>
-        );
-      })}
-
-      {/* Distant galaxy */}
-      <mesh position={[100, 50, -200]} rotation={[0.5, 0, 0.3]}>
-        <ringGeometry args={[5, 15, 32]} />
-        <meshBasicMaterial
-          color="#8866ff"
-          transparent
-          opacity={0.15}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
+      {/* Shooting stars easter egg */}
+      <ShootingStars />
     </>
   );
 }
