@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { PerspectiveCamera } from "@react-three/drei";
+import { PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SpaceBackground from "./SpaceBackground";
@@ -128,6 +128,19 @@ export default function Scene() {
           <span>←</span>
           <span>{language === 'ko' ? '우주로 돌아가기' : 'Back to Space'}</span>
         </motion.button>
+      )}
+
+      {/* Guide message for space mode */}
+      {sceneMode === 'space' && !isTransitioning && !hoveredPlanetId && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-30 text-white/90 text-lg font-medium tracking-wide"
+        >
+          <span className="bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
+            {language === 'ko' ? '🪐 행성을 클릭하여 탐험해보세요!' : '🪐 Click a planet to explore!'}
+          </span>
+        </motion.div>
       )}
 
       {/* Launch indicator when entering or exiting */}
@@ -272,6 +285,20 @@ export default function Scene() {
                   isLaunching={isTransitioning}
                 />
               </Suspense>
+
+              {/* Space exploration controls */}
+              <OrbitControls
+                enableZoom={true}
+                enablePan={true}
+                enableRotate={true}
+                zoomSpeed={0.5}
+                panSpeed={0.5}
+                rotateSpeed={0.3}
+                minDistance={10}
+                maxDistance={100}
+                maxPolarAngle={Math.PI * 0.85}
+                minPolarAngle={Math.PI * 0.15}
+              />
             </>
           ) : (
             <>

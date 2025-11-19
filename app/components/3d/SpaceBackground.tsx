@@ -145,6 +145,60 @@ export default function SpaceBackground() {
           side={THREE.BackSide}
         />
       </mesh>
+
+      {/* Additional nebula details */}
+      <mesh position={[60, 10, -120]}>
+        <sphereGeometry args={[35, 32, 32]} />
+        <meshBasicMaterial
+          color="#3a0a1e"
+          transparent
+          opacity={0.2}
+          side={THREE.BackSide}
+        />
+      </mesh>
+
+      <mesh position={[-60, 30, -90]}>
+        <sphereGeometry args={[28, 32, 32]} />
+        <meshBasicMaterial
+          color="#0a2a3e"
+          transparent
+          opacity={0.25}
+          side={THREE.BackSide}
+        />
+      </mesh>
+
+      {/* Asteroid belt hints */}
+      {Array.from({ length: 30 }).map((_, i) => {
+        const angle = (i / 30) * Math.PI * 2;
+        const radius = 70 + Math.random() * 20;
+        const y = (Math.random() - 0.5) * 10;
+        return (
+          <mesh
+            key={`asteroid-${i}`}
+            position={[
+              Math.cos(angle) * radius,
+              y,
+              Math.sin(angle) * radius - 50
+            ]}
+            rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]}
+          >
+            <dodecahedronGeometry args={[0.3 + Math.random() * 0.5, 0]} />
+            <meshStandardMaterial color="#555555" roughness={0.9} />
+          </mesh>
+        );
+      })}
+
+      {/* Distant galaxy */}
+      <mesh position={[100, 50, -200]} rotation={[0.5, 0, 0.3]}>
+        <ringGeometry args={[5, 15, 32]} />
+        <meshBasicMaterial
+          color="#8866ff"
+          transparent
+          opacity={0.15}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
     </>
   );
 }

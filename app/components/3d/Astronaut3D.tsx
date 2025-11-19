@@ -8,13 +8,15 @@ interface Astronaut3DProps {
   targetPosition: [number, number, number];
   isMoving: boolean;
   isLaunching?: boolean;
+  targetPlanetSize?: number;
 }
 
-export default function Astronaut3D({ targetPosition, isMoving, isLaunching = false }: Astronaut3DProps) {
+export default function Astronaut3D({ targetPosition, isMoving, isLaunching = false, targetPlanetSize = 1 }: Astronaut3DProps) {
   const groupRef = useRef<THREE.Group>(null);
   const currentPosition = useRef(new THREE.Vector3(0, 0, 15));
   const floatOffset = useRef(0);
   const launchProgress = useRef(0);
+  const targetRotation = useRef(new THREE.Quaternion());
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
@@ -26,9 +28,10 @@ export default function Astronaut3D({ targetPosition, isMoving, isLaunching = fa
 
     // Smooth movement towards target
     const target = new THREE.Vector3(...targetPosition);
-    // Position astronaut slightly in front of the planet
+    // Position astronaut slightly in front of the planet - scale with planet size
     const direction = target.clone().sub(currentPosition.current).normalize();
-    const offsetDistance = isLaunching ? 0 : 5; // Go directly to planet when launching
+    const baseOffset = 5 + targetPlanetSize * 2; // Bigger planets = further distance
+    const offsetDistance = isLaunching ? 0 : baseOffset;
     const finalTarget = target.clone().sub(direction.multiplyScalar(offsetDistance));
 
     if (isLaunching) {
@@ -51,10 +54,29 @@ export default function Astronaut3D({ targetPosition, isMoving, isLaunching = fa
       currentPosition.current.z
     );
 
-    // Rotate to face target
+    // Rotate to face target without flipping
     if (isMoving || isLaunching) {
       const lookTarget = new THREE.Vector3(...targetPosition);
-      groupRef.current.lookAt(lookTarget);
+      const lookDirection = lookTarget.clone().sub(groupRef.current.position).normalize();
+
+      // Create rotation matrix that keeps "up" aligned with world Y
+      const rotMatrix = new THREE.Matrix4();
+      const up = new THREE.Vector3(0, 1, 0);
+
+      // Only rotate around Y axis primarily
+      const flatDirection = new THREE.Vector3(lookDirection.x, 0, lookDirection.z).normalize();
+
+      if (flatDirection.length() > 0.001) {
+        rotMatrix.lookAt(
+          groupRef.current.position,
+          groupRef.current.position.clone().add(flatDirection),
+          up
+        );
+        targetRotation.current.setFromRotationMatrix(rotMatrix);
+
+        // Smooth rotation interpolation
+        groupRef.current.quaternion.slerp(targetRotation.current, delta * 3);
+      }
     }
 
     // Subtle rotation animation (disabled during launch)
@@ -64,7 +86,7 @@ export default function Astronaut3D({ targetPosition, isMoving, isLaunching = fa
   });
 
   return (
-    <group ref={groupRef} scale={0.4}>
+    <group ref={groupRef} scale={0.7}>
       {/* Helmet (head) */}
       <mesh position={[0, 1.2, 0]}>
         <sphereGeometry args={[0.5, 32, 32]} />

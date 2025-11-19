@@ -33,6 +33,8 @@ export default function PlanetSystem({
     ? hoveredPlanet.position
     : [0, 0, 15];
 
+  const targetPlanetSize = hoveredPlanet ? hoveredPlanet.size : 1;
+
   const handlePlanetSelect = (planetId: string) => {
     // First click selects, second click enters (same for mobile and desktop)
     if (hoveredPlanetId === planetId) {
@@ -65,6 +67,7 @@ export default function PlanetSystem({
         targetPosition={targetPosition}
         isMoving={hoveredPlanetId !== null}
         isLaunching={isLaunching}
+        targetPlanetSize={targetPlanetSize}
       />
 
       {/* Planets */}

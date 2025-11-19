@@ -13,13 +13,15 @@ export default function CameraController({ targetPosition, isActive }: CameraCon
   const { camera } = useThree();
   const defaultPosition = useRef(new THREE.Vector3(0, 5, 35));
   const currentTarget = useRef(new THREE.Vector3(0, 0, 0));
+  const wasActive = useRef(false);
+  const returningToDefault = useRef(false);
 
   useFrame(() => {
-    if (!isActive || !targetPosition) {
-      // Return to default position smoothly
-      camera.position.lerp(defaultPosition.current, 0.02);
-      currentTarget.current.lerp(new THREE.Vector3(0, 0, 0), 0.02);
-    } else {
+    // Only move camera when a planet is selected
+    if (isActive && targetPosition) {
+      wasActive.current = true;
+      returningToDefault.current = false;
+
       // Move camera towards the target planet
       const target = new THREE.Vector3(...targetPosition);
 
@@ -36,9 +38,26 @@ export default function CameraController({ targetPosition, isActive }: CameraCon
 
       // Look at the planet
       currentTarget.current.lerp(target, 0.05);
-    }
+      camera.lookAt(currentTarget.current);
+    } else {
+      // When planet is deselected, return to default position
+      if (wasActive.current) {
+        wasActive.current = false;
+        returningToDefault.current = true;
+      }
 
-    camera.lookAt(currentTarget.current);
+      // Smoothly return to default position after deselection
+      if (returningToDefault.current) {
+        camera.position.lerp(defaultPosition.current, 0.03);
+        currentTarget.current.lerp(new THREE.Vector3(0, 0, 0), 0.03);
+        camera.lookAt(currentTarget.current);
+
+        // Stop returning when close enough to default
+        if (camera.position.distanceTo(defaultPosition.current) < 0.5) {
+          returningToDefault.current = false;
+        }
+      }
+    }
   });
 
   return null;
