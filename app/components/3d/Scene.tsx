@@ -25,6 +25,7 @@ export default function Scene() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [hoveredPlanetId, setHoveredPlanetId] = useState<string | null>(null);
+  const [isCameraZooming, setIsCameraZooming] = useState(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const { language } = useLanguage();
 
@@ -62,16 +63,23 @@ export default function Scene() {
     const project = projects.find(p => p.id === planet.projectId);
     if (!project) return;
 
+    // Step 1: Astronaut starts flying to planet
     setIsTransitioning(true);
     setCurrentPlanet(planet);
     setCurrentProject(project);
 
-    // Transition to surface after animation
+    // Step 2: After astronaut moves, camera starts zooming
+    setTimeout(() => {
+      setIsCameraZooming(true);
+    }, 400);
+
+    // Step 3: Transition to surface after both animations
     setTimeout(() => {
       setSceneMode('surface');
       setIsTransitioning(false);
+      setIsCameraZooming(false);
       setHoveredPlanetId(null);
-    }, 800);
+    }, 1200);
   };
 
   const handleBackToSpace = () => {
@@ -265,7 +273,7 @@ export default function Scene() {
               <CameraController
                 targetPosition={hoveredPlanet?.position || null}
                 isActive={hoveredPlanetId !== null && !isTransitioning}
-                isEntering={isTransitioning}
+                isEntering={isCameraZooming}
               />
 
               <ambientLight intensity={0.4} color="#ffffff" />
