@@ -26,8 +26,15 @@ export default function Scene() {
   const [isExiting, setIsExiting] = useState(false);
   const [hoveredPlanetId, setHoveredPlanetId] = useState<string | null>(null);
   const [isCameraZooming, setIsCameraZooming] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const { language } = useLanguage();
+
+  // Hide loading after initial render
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Detect mobile device
   useEffect(() => {
@@ -121,6 +128,27 @@ export default function Scene() {
 
   return (
     <>
+      {/* Loading Indicator */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[100] bg-[#020010] flex flex-col items-center justify-center"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full mb-4"
+            />
+            <p className="text-white/80 text-lg">
+              {language === 'ko' ? '우주 로딩 중...' : 'Loading Space...'}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Language Toggle */}
       <LanguageToggle />
 
@@ -132,8 +160,9 @@ export default function Scene() {
           exit={{ opacity: 0, x: -20 }}
           onClick={handleBackToSpace}
           className="fixed top-6 left-6 z-30 bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-black/70 transition-colors flex items-center gap-2"
+          aria-label={language === 'ko' ? '우주로 돌아가기' : 'Back to Space'}
         >
-          <span>←</span>
+          <span aria-hidden="true">←</span>
           <span>{language === 'ko' ? '우주로 돌아가기' : 'Back to Space'}</span>
         </motion.button>
       )}
@@ -144,9 +173,12 @@ export default function Scene() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="fixed top-6 left-1/2 -translate-x-1/2 z-30 text-white/90 text-lg font-medium tracking-wide"
+          role="status"
         >
           <span className="bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
-            {language === 'ko' ? '🪐 행성을 클릭하여 탐험해보세요!' : '🪐 Click a planet to explore!'}
+            {language === 'ko'
+              ? (isMobile ? '🪐 행성을 탭하여 탐험해보세요!' : '🪐 행성을 클릭하여 탐험해보세요!')
+              : (isMobile ? '🪐 Tap a planet to explore!' : '🪐 Click a planet to explore!')}
           </span>
         </motion.div>
       )}
@@ -177,14 +209,18 @@ export default function Scene() {
       )}
 
       {/* Instructions */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 text-white/60 text-sm pointer-events-none text-center px-4">
+      <div
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 text-white/60 text-sm pointer-events-none text-center px-4"
+        role="status"
+        aria-live="polite"
+      >
         {sceneMode === 'space'
           ? (language === 'ko'
-            ? "드래그하여 탐색 • 행성 클릭하여 선택 • 다시 클릭하여 진입"
-            : "Drag to explore • Click planet to select • Click again to enter")
+            ? (isMobile ? "드래그하여 탐색 • 행성 탭하여 선택 • 다시 탭하여 진입" : "드래그하여 탐색 • 행성 클릭하여 선택 • 다시 클릭하여 진입")
+            : (isMobile ? "Drag to explore • Tap planet to select • Tap again to enter" : "Drag to explore • Click planet to select • Click again to enter"))
           : (language === 'ko'
-            ? "드래그하여 주변 탐색 • 깃발 클릭하여 프로젝트 보기 • ESC로 우주 복귀"
-            : "Drag to look around • Click flag to view project • ESC to return")}
+            ? (isMobile ? "드래그하여 주변 탐색 • 깃발 탭하여 프로젝트 보기" : "드래그하여 주변 탐색 • 깃발 클릭하여 프로젝트 보기 • ESC로 우주 복귀")
+            : (isMobile ? "Drag to look around • Tap flag to view project" : "Drag to look around • Click flag to view project • ESC to return"))}
       </div>
 
       {/* Project Preview Panel - space mode only */}
@@ -223,7 +259,9 @@ export default function Scene() {
                 )}
               </div>
               <div className="text-center text-white/50 text-xs">
-                {language === 'ko' ? "다시 클릭하여 탐사 시작" : "Click again to start exploration"}
+                {language === 'ko'
+                  ? (isMobile ? "다시 탭하여 탐사 시작" : "다시 클릭하여 탐사 시작")
+                  : (isMobile ? "Tap again to start exploration" : "Click again to start exploration")}
               </div>
             </div>
           </motion.div>
