@@ -1,7 +1,6 @@
 "use client";
 
 import type { Project } from "@/app/types";
-import AudioPlayer from "./AudioPlayer";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import Image from "next/image";
 
@@ -113,16 +112,6 @@ export default function CardDetailContent({
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-            />
-          </div>
-        )}
-
-        {/* Audio Player */}
-        {project.audioUrl && (
-          <div className="pt-2">
-            <AudioPlayer
-              audioUrl={project.audioUrl}
-              label={t("프로젝트 소개 듣기", "Listen to overview")}
             />
           </div>
         )}
