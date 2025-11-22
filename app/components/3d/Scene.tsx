@@ -379,7 +379,7 @@ export default function Scene() {
             <>
               <color attach="background" args={["#0a0e1a"]} />
 
-              <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={60} />
+              <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={65} />
 
               <Suspense fallback={null}>
                 <SpaceBackground />
@@ -397,18 +397,18 @@ export default function Scene() {
                 />
               </Suspense>
 
-              {/* Free floating camera controls */}
+              {/* Camera controls - closer view */}
               <OrbitControls
                 enableZoom={true}
                 enablePan={true}
                 enableRotate={true}
-                zoomSpeed={0.8}
-                rotateSpeed={0.6}
-                panSpeed={0.5}
-                minDistance={8}
-                maxDistance={40}
-                maxPolarAngle={Math.PI * 0.9}
-                minPolarAngle={Math.PI * 0.1}
+                zoomSpeed={0.6}
+                rotateSpeed={0.5}
+                panSpeed={0.4}
+                minDistance={5}
+                maxDistance={25}
+                maxPolarAngle={Math.PI * 0.85}
+                minPolarAngle={Math.PI * 0.15}
                 target={[0, 0, -6]}
               />
             </>
