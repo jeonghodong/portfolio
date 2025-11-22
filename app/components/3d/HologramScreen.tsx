@@ -96,9 +96,6 @@ export default function HologramScreen({
       position={position}
       rotation={rotation}
       scale={scale}
-      onClick={handleClick}
-      onPointerOver={handlePointerOver}
-      onPointerOut={handlePointerOut}
     >
       {/* Hologram frame */}
       <mesh ref={frameRef}>
@@ -112,8 +109,13 @@ export default function HologramScreen({
         />
       </mesh>
 
-      {/* Hologram screen background */}
-      <mesh position={[0, 0, 0.03]}>
+      {/* Hologram screen background - clickable area */}
+      <mesh
+        position={[0, 0, 0.03]}
+        onClick={handleClick}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      >
         <planeGeometry args={[3, 2]} />
         <meshBasicMaterial
           color="#001122"

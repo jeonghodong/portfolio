@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Suspense, useEffect, useRef, useState } from "react";
 import CardDetailContent from "../ui/CardDetailContent";
 import LanguageToggle from "../ui/LanguageToggle";
+import CameraAnimator from "./CameraAnimator";
 import HologramDisplaySystem from "./HologramDisplaySystem";
 import PlanetSurface from "./PlanetSurface";
 import SpaceBackground from "./SpaceBackground";
@@ -395,10 +396,12 @@ export default function Scene() {
                   duration={2.5}
                   onComplete={handleWarpComplete}
                 />
+                <CameraAnimator selectedPlanetId={selectedPlanetId} />
               </Suspense>
 
-              {/* Camera controls - closer view */}
+              {/* Camera controls - disable when screen is selected */}
               <OrbitControls
+                enabled={!selectedPlanetId}
                 enableZoom={true}
                 enablePan={true}
                 enableRotate={true}
