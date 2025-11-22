@@ -22,7 +22,7 @@ export default function WarpJump({
 
   // Create star field for warp effect
   const { positions, velocities } = useMemo(() => {
-    const count = 2000;
+    const count = 2500;
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count);
 
@@ -31,7 +31,8 @@ export default function WarpJump({
       // Random position in a cylinder around the camera
       const theta = Math.random() * Math.PI * 2;
       const radius = 5 + Math.random() * 30;
-      const z = -100 - Math.random() * 200;
+      // Spread stars closer - some near, some far
+      const z = -15 - Math.random() * 150; // Changed from -100~-300 to -15~-165
 
       positions[i3] = Math.cos(theta) * radius;
       positions[i3 + 1] = Math.sin(theta) * radius;
@@ -79,7 +80,7 @@ export default function WarpJump({
 
         // Reset star if it passes the camera
         if (posArray[i3 + 2] > 10) {
-          posArray[i3 + 2] = -300;
+          posArray[i3 + 2] = -165; // Reset closer to maintain star density
         }
       }
 
@@ -113,7 +114,7 @@ export default function WarpJump({
       <points ref={starsRef}>
         <bufferGeometry attach="geometry" {...starsGeometry} />
         <pointsMaterial
-          size={0.8}
+          size={0.2}
           color="#aaccff"
           transparent
           opacity={0.9}
