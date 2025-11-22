@@ -173,7 +173,7 @@ export default function Scene() {
       {/* TV Turnon Effect Overlay */}
       <TVTurnonOverlay
         isActive={isTVTurnonActive}
-        duration={1.0}
+        duration={2.0}
         onComplete={handleTVTurnonComplete}
       />
 

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Planet, Project } from '@/app/types';
-import { planets, projects } from '@/app/lib/data';
-import HologramScreen from './HologramScreen';
+import { Planet, Project } from "@/app/types";
+import { planets, projects } from "@/app/lib/data";
+import HologramScreen from "./HologramScreen";
 
 interface HologramDisplaySystemProps {
   selectedPlanetId: string | null;
@@ -68,7 +68,9 @@ export default function HologramDisplaySystem({
           isSelected={selectedPlanetId === screen.planet.id}
           isHovered={hoveredPlanetId === screen.planet.id}
           onSelect={() => onPlanetSelect(screen.planet.id)}
-          onHover={(hovered) => onPlanetHover(hovered ? screen.planet.id : null)}
+          onHover={(hovered) =>
+            onPlanetHover(hovered ? screen.planet.id : null)
+          }
           onEnter={() => onPlanetEnter(screen.planet.id)}
         />
       ))}
