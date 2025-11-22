@@ -7,12 +7,14 @@ interface TVTurnonOverlayProps {
   isActive: boolean;
   duration?: number;
   onComplete?: () => void;
+  skipTwoStage?: boolean; // Skip 2-stage animation, go straight to 100%
 }
 
 export default function TVTurnonOverlay({
   isActive,
   duration = 1.0,
   onComplete,
+  skipTwoStage = false,
 }: TVTurnonOverlayProps) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -73,24 +75,44 @@ export default function TVTurnonOverlay({
           {/* Top panel - 2-stage animation: 0% → 50% (slow) → 100% (fast) */}
           <motion.div
             initial={{ y: "0%" }}
-            animate={{ y: ["-0%", "-50%", "-100%"] }}
-            transition={{
-              duration: duration,
-              times: [0, 0.7, 1], // Slow to 50%, then fast to 100%
-              ease: [0.43, 0.13, 0.23, 0.96],
-            }}
+            animate={
+              skipTwoStage
+                ? { y: "-100%" }
+                : { y: ["-0%", "-50%", "-100%"] }
+            }
+            transition={
+              skipTwoStage
+                ? {
+                    duration: duration,
+                    ease: [0.43, 0.13, 0.23, 0.96],
+                  }
+                : {
+                    duration: duration,
+                    times: [0, 0.7, 1], // Slow to 50%, then fast to 100%
+                    ease: [0.43, 0.13, 0.23, 0.96],
+                  }
+            }
             className="absolute top-0 left-0 right-0 h-1/2 bg-black"
           />
 
           {/* Bottom panel - 2-stage animation: 0% → 50% (slow) → 100% (fast) */}
           <motion.div
             initial={{ y: "0%" }}
-            animate={{ y: ["0%", "50%", "100%"] }}
-            transition={{
-              duration: duration,
-              times: [0, 0.7, 1], // Slow to 50%, then fast to 100%
-              ease: [0.43, 0.13, 0.23, 0.96],
-            }}
+            animate={
+              skipTwoStage ? { y: "100%" } : { y: ["0%", "50%", "100%"] }
+            }
+            transition={
+              skipTwoStage
+                ? {
+                    duration: duration,
+                    ease: [0.43, 0.13, 0.23, 0.96],
+                  }
+                : {
+                    duration: duration,
+                    times: [0, 0.7, 1], // Slow to 50%, then fast to 100%
+                    ease: [0.43, 0.13, 0.23, 0.96],
+                  }
+            }
             className="absolute bottom-0 left-0 right-0 h-1/2 bg-black"
           />
         </motion.div>

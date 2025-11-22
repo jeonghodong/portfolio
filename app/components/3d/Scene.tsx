@@ -173,8 +173,9 @@ export default function Scene() {
       {/* TV Turnon Effect Overlay */}
       <TVTurnonOverlay
         isActive={isTVTurnonActive}
-        duration={2.0}
+        duration={sceneMode === "spaceship" ? 0.8 : 2.0}
         onComplete={handleTVTurnonComplete}
+        skipTwoStage={sceneMode === "spaceship"}
       />
 
       {/* Loading Indicator */}
