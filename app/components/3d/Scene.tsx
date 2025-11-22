@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Suspense, useEffect, useRef, useState } from "react";
 import CardDetailContent from "../ui/CardDetailContent";
 import LanguageToggle from "../ui/LanguageToggle";
+import TVShutoffOverlay from "../ui/TVShutoffOverlay";
 import CameraAnimator from "./CameraAnimator";
 import HologramDisplaySystem from "./HologramDisplaySystem";
 import MouseCameraController from "./MouseCameraController";
@@ -29,6 +30,7 @@ export default function Scene() {
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
   const [hoveredPlanetId, setHoveredPlanetId] = useState<string | null>(null);
   const [isWarpActive, setIsWarpActive] = useState(false);
+  const [isTVShutoffActive, setIsTVShutoffActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const orbitControlsRef = useRef<any>(null);
@@ -88,9 +90,15 @@ export default function Scene() {
   };
 
   const handleWarpComplete = () => {
-    // Transition to planet surface after warp
-    setSceneMode("surface");
+    // Start TV shutoff effect after warp completes
     setIsWarpActive(false);
+    setIsTVShutoffActive(true);
+  };
+
+  const handleTVShutoffComplete = () => {
+    // Transition to planet surface after TV shutoff
+    setIsTVShutoffActive(false);
+    setSceneMode("surface");
     setIsTransitioning(false);
     setSelectedPlanetId(null);
     setHoveredPlanetId(null);
@@ -100,18 +108,21 @@ export default function Scene() {
     // Start exit animation
     setIsExiting(true);
 
-    // After astronaut launches, transition to ship
+    // After astronaut launches, start TV shutoff effect
     setTimeout(() => {
       setIsTransitioning(true);
+      setIsTVShutoffActive(true);
     }, 1000);
 
+    // After TV shutoff completes, return to spaceship
     setTimeout(() => {
       setSceneMode("spaceship");
       setCurrentPlanet(null);
       setCurrentProject(null);
       setIsTransitioning(false);
       setIsExiting(false);
-    }, 1500);
+      setIsTVShutoffActive(false);
+    }, 2500); // 1000ms exit + 1000ms TV effect + 500ms buffer
   };
 
   const handleFlagClick = () => {
@@ -135,6 +146,13 @@ export default function Scene() {
 
   return (
     <>
+      {/* TV Shutoff Effect Overlay */}
+      <TVShutoffOverlay
+        isActive={isTVShutoffActive}
+        duration={1.0}
+        onComplete={handleTVShutoffComplete}
+      />
+
       {/* Loading Indicator */}
       <AnimatePresence>
         {isLoading && (
