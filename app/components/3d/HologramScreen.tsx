@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { useSpring, animated } from '@react-spring/three';
@@ -35,6 +35,20 @@ export default function HologramScreen({
   const groupRef = useRef<THREE.Group>(null);
   const frameRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Track mouse position
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      // Normalize to -1 to 1 range
+      const x = (event.clientX / window.innerWidth) * 2 - 1;
+      const y = -(event.clientY / window.innerHeight) * 2 + 1;
+      setMousePosition({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Animation for selection - larger scale for selected
   const { scale, glowIntensity } = useSpring({
@@ -43,7 +57,7 @@ export default function HologramScreen({
     config: { tension: 200, friction: 40 },
   });
 
-  // Hologram flicker effect
+  // Hologram flicker effect and mouse-based rotation
   useFrame((state) => {
     if (glowRef.current) {
       const time = state.clock.elapsedTime;
@@ -58,6 +72,21 @@ export default function HologramScreen({
     // Gentle floating animation
     if (groupRef.current && !isSelected) {
       groupRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5 + position[0]) * 0.05;
+    }
+
+    // Mouse-based rotation for depth effect
+    if (groupRef.current) {
+      const maxTilt = 0.15; // Maximum tilt in radians (~8.6 degrees)
+
+      // Calculate target rotation based on mouse position and screen position
+      // Screens further from mouse cursor center should tilt more
+      const targetRotationY = mousePosition.x * maxTilt;
+      const targetRotationX = -mousePosition.y * maxTilt;
+
+      // Smooth lerp to target rotation
+      const currentRotation = groupRef.current.rotation;
+      currentRotation.y += (targetRotationY - currentRotation.y) * 0.05;
+      currentRotation.x += (targetRotationX - currentRotation.x) * 0.05;
     }
   });
 
@@ -84,11 +113,29 @@ export default function HologramScreen({
     document.body.style.cursor = 'auto';
   };
 
-  const glowColor = new THREE.Color(planet.color);
+  const glowColor = new THREE.Color(planet.environment.particleColor);
   const title = project ? project[`title_${language}`] : planet[`name_${language}`];
   const description = project
     ? project[`description_${language}`]
     : `Explore ${planet[`name_${language}`]}`;
+
+  // Particle geometry for selected state
+  const particleGeometry = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(
+      Array.from({ length: 60 }, (_, i) => {
+        const angle = (i / 20) * Math.PI * 2;
+        const radius = 1.8 + Math.random() * 0.3;
+        return [
+          Math.cos(angle) * radius,
+          Math.sin(angle) * radius,
+          0.1 + Math.random() * 0.1,
+        ];
+      }).flat()
+    );
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    return geometry;
+  }, []);
 
   return (
     <animated.group
@@ -150,7 +197,7 @@ export default function HologramScreen({
       {/* Planet icon/indicator */}
       <mesh position={[0, 0.7, 0.06]}>
         <circleGeometry args={[0.25, 32]} />
-        <meshBasicMaterial color={planet.color} transparent opacity={0.7} />
+        <meshBasicMaterial color={planet.environment.particleColor} transparent opacity={0.7} />
       </mesh>
 
       {/* Title */}
@@ -207,25 +254,7 @@ export default function HologramScreen({
 
       {/* Particle effect around selected screen */}
       {isSelected && (
-        <points>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={20}
-              array={new Float32Array(
-                Array.from({ length: 60 }, (_, i) => {
-                  const angle = (i / 20) * Math.PI * 2;
-                  const radius = 1.8 + Math.random() * 0.3;
-                  return [
-                    Math.cos(angle) * radius,
-                    Math.sin(angle) * radius,
-                    0.1 + Math.random() * 0.1,
-                  ];
-                }).flat()
-              )}
-              itemSize={3}
-            />
-          </bufferGeometry>
+        <points geometry={particleGeometry}>
           <pointsMaterial
             size={0.03}
             color={glowColor}

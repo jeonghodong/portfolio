@@ -11,6 +11,7 @@ import CardDetailContent from "../ui/CardDetailContent";
 import LanguageToggle from "../ui/LanguageToggle";
 import CameraAnimator from "./CameraAnimator";
 import HologramDisplaySystem from "./HologramDisplaySystem";
+import MouseCameraController from "./MouseCameraController";
 import PlanetSurface from "./PlanetSurface";
 import SpaceBackground from "./SpaceBackground";
 import WarpJump from "./WarpJump";
@@ -30,6 +31,7 @@ export default function Scene() {
   const [isWarpActive, setIsWarpActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const orbitControlsRef = useRef<any>(null);
   const { language } = useLanguage();
 
   // Hide loading after initial render
@@ -277,7 +279,9 @@ export default function Scene() {
                 <div className="flex items-center gap-2 mb-3">
                   <span
                     className="w-2 h-2 rounded-full animate-pulse"
-                    style={{ backgroundColor: hoveredPlanet?.color }}
+                    style={{
+                      backgroundColor: hoveredPlanet?.environment.particleColor,
+                    }}
                   />
                   <span className="text-white/60 text-sm uppercase tracking-wide">
                     {hoveredProject
@@ -380,7 +384,7 @@ export default function Scene() {
             <>
               <color attach="background" args={["#0a0e1a"]} />
 
-              <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={65} />
+              <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={45} />
 
               <Suspense fallback={null}>
                 <SpaceBackground />
@@ -397,10 +401,17 @@ export default function Scene() {
                   onComplete={handleWarpComplete}
                 />
                 <CameraAnimator selectedPlanetId={selectedPlanetId} />
+                <MouseCameraController
+                  enabled={!selectedPlanetId && !isWarpActive}
+                  maxAngle={70}
+                  sensitivity={1}
+                  orbitControlsRef={orbitControlsRef}
+                />
               </Suspense>
 
-              {/* Camera controls - disable when screen is selected */}
+              {/* Camera controls - zoom, pan, and rotate enabled */}
               <OrbitControls
+                ref={orbitControlsRef}
                 enabled={!selectedPlanetId}
                 enableZoom={true}
                 enablePan={true}
@@ -410,8 +421,10 @@ export default function Scene() {
                 panSpeed={0.4}
                 minDistance={5}
                 maxDistance={25}
-                maxPolarAngle={Math.PI * 0.85}
-                minPolarAngle={Math.PI * 0.15}
+                maxPolarAngle={Math.PI / 2 + (70 * Math.PI) / 180}
+                minPolarAngle={Math.PI / 2 - (70 * Math.PI) / 180}
+                maxAzimuthAngle={(70 * Math.PI) / 180}
+                minAzimuthAngle={-(70 * Math.PI) / 180}
                 target={[0, 0, -6]}
               />
             </>

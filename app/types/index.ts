@@ -67,6 +67,7 @@ export interface Planet {
   id: string;
   name: string;
   name_ko: string;
+  name_en: string;
   size: number;
   textureUrl: string;
   position: [number, number, number];

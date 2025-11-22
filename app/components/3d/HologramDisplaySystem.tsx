@@ -68,7 +68,7 @@ export default function HologramDisplaySystem({
           isSelected={selectedPlanetId === screen.planet.id}
           isHovered={hoveredPlanetId === screen.planet.id}
           onSelect={() => onPlanetSelect(screen.planet.id)}
-          onHover={onPlanetHover}
+          onHover={(hovered) => onPlanetHover(hovered ? screen.planet.id : null)}
           onEnter={() => onPlanetEnter(screen.planet.id)}
         />
       ))}
