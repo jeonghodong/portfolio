@@ -10,6 +10,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import CardDetailContent from "../ui/CardDetailContent";
 import LanguageToggle from "../ui/LanguageToggle";
 import TVShutoffOverlay from "../ui/TVShutoffOverlay";
+import TVTurnonOverlay from "../ui/TVTurnonOverlay";
 import CameraAnimator from "./CameraAnimator";
 import HologramDisplaySystem from "./HologramDisplaySystem";
 import MouseCameraController from "./MouseCameraController";
@@ -31,6 +32,7 @@ export default function Scene() {
   const [hoveredPlanetId, setHoveredPlanetId] = useState<string | null>(null);
   const [isWarpActive, setIsWarpActive] = useState(false);
   const [isTVShutoffActive, setIsTVShutoffActive] = useState(false);
+  const [isTVTurnonActive, setIsTVTurnonActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const orbitControlsRef = useRef<any>(null);
@@ -102,10 +104,15 @@ export default function Scene() {
     setSelectedPlanetId(null);
     setHoveredPlanetId(null);
 
-    // Keep black screen for a bit longer to ensure new scene is rendered
+    // Wait a bit for new scene to render, then start turnon effect
     setTimeout(() => {
       setIsTVShutoffActive(false);
-    }, 800);
+      setIsTVTurnonActive(true);
+    }, 300);
+  };
+
+  const handleTVTurnonComplete = () => {
+    setIsTVTurnonActive(false);
   };
 
   const handleBackToShip = () => {
@@ -127,9 +134,10 @@ export default function Scene() {
       setIsTransitioning(false);
       setIsExiting(false);
 
-      // Keep black screen a bit longer to ensure spaceship scene is rendered
+      // Wait a bit for spaceship scene to render, then start turnon effect
       setTimeout(() => {
         setIsTVShutoffActive(false);
+        setIsTVTurnonActive(true);
       }, 300);
     }, 2500); // 1000ms exit + 1000ms TV effect + 500ms buffer
   };
@@ -160,6 +168,13 @@ export default function Scene() {
         isActive={isTVShutoffActive}
         duration={1.0}
         onComplete={handleTVShutoffComplete}
+      />
+
+      {/* TV Turnon Effect Overlay */}
+      <TVTurnonOverlay
+        isActive={isTVTurnonActive}
+        duration={1.0}
+        onComplete={handleTVTurnonComplete}
       />
 
       {/* Loading Indicator */}
