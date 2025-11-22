@@ -42,10 +42,15 @@ export default function TVShutoffOverlay({
   return (
     <AnimatePresence>
       {isActive && (
-        <div className="fixed inset-0 z-[999] pointer-events-none overflow-hidden">
+        <motion.div
+          className="fixed inset-0 z-[999] pointer-events-none overflow-hidden"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           {/* Top panel - slides down */}
           <motion.div
-            initial={{ y: "-100%" }}
+            initial={{ y: "-50%" }}
             animate={{ y: "0%" }}
             transition={{
               duration: duration * 0.5,
@@ -56,7 +61,7 @@ export default function TVShutoffOverlay({
 
           {/* Bottom panel - slides up */}
           <motion.div
-            initial={{ y: "100%" }}
+            initial={{ y: "50%" }}
             animate={{ y: "0%" }}
             transition={{
               duration: duration * 0.5,
@@ -70,7 +75,7 @@ export default function TVShutoffOverlay({
             initial={{ x: "-100%" }}
             animate={{ x: "0%" }}
             transition={{
-              duration: duration * 0.5,
+              duration: duration * 2,
               delay: duration * 0.3,
               ease: [0.43, 0.13, 0.23, 0.96],
             }}
@@ -82,13 +87,13 @@ export default function TVShutoffOverlay({
             initial={{ x: "100%" }}
             animate={{ x: "0%" }}
             transition={{
-              duration: duration * 0.5,
+              duration: duration * 2,
               delay: duration * 0.3,
               ease: [0.43, 0.13, 0.23, 0.96],
             }}
             className="absolute top-0 bottom-0 right-0 w-1/2 bg-black"
           />
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

@@ -96,12 +96,16 @@ export default function Scene() {
   };
 
   const handleTVShutoffComplete = () => {
-    // Transition to planet surface after TV shutoff
-    setIsTVShutoffActive(false);
+    // Change scene mode first (so new scene can render)
     setSceneMode("surface");
     setIsTransitioning(false);
     setSelectedPlanetId(null);
     setHoveredPlanetId(null);
+
+    // Keep black screen for a bit longer to ensure new scene is rendered
+    setTimeout(() => {
+      setIsTVShutoffActive(false);
+    }, 800);
   };
 
   const handleBackToShip = () => {
@@ -116,12 +120,17 @@ export default function Scene() {
 
     // After TV shutoff completes, return to spaceship
     setTimeout(() => {
+      // Change scene mode first
       setSceneMode("spaceship");
       setCurrentPlanet(null);
       setCurrentProject(null);
       setIsTransitioning(false);
       setIsExiting(false);
-      setIsTVShutoffActive(false);
+
+      // Keep black screen a bit longer to ensure spaceship scene is rendered
+      setTimeout(() => {
+        setIsTVShutoffActive(false);
+      }, 300);
     }, 2500); // 1000ms exit + 1000ms TV effect + 500ms buffer
   };
 
