@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useRef, useMemo, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import { useRef, useMemo, useState } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 
 // Shooting star component
 function ShootingStar({ onComplete }: { onComplete: () => void }) {
@@ -30,10 +30,10 @@ function ShootingStar({ onComplete }: { onComplete: () => void }) {
   const lineObject = useMemo(() => {
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(6);
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     const mat = new THREE.LineBasicMaterial({
-      color: '#ffffff',
+      color: "#ffffff",
       transparent: true,
       opacity: 0.8,
       blending: THREE.AdditiveBlending,
@@ -47,7 +47,8 @@ function ShootingStar({ onComplete }: { onComplete: () => void }) {
 
     progressRef.current += delta * config.speed;
 
-    const positions = lineRef.current.geometry.attributes.position.array as Float32Array;
+    const positions = lineRef.current.geometry.attributes.position
+      .array as Float32Array;
 
     // Head position
     const headX = config.startX + config.dirX * progressRef.current;
@@ -95,19 +96,19 @@ function ShootingStars() {
 
     if (nextSpawnRef.current <= 0) {
       // Spawn new shooting star
-      setStars(prev => [...prev, idCounterRef.current++]);
+      setStars((prev) => [...prev, idCounterRef.current++]);
       // Next spawn in 2-6 seconds
       nextSpawnRef.current = 2 + Math.random() * 4;
     }
   });
 
   const handleComplete = (id: number) => {
-    setStars(prev => prev.filter(starId => starId !== id));
+    setStars((prev) => prev.filter((starId) => starId !== id));
   };
 
   return (
     <>
-      {stars.map(id => (
+      {stars.map((id) => (
         <ShootingStar key={id} onComplete={() => handleComplete(id)} />
       ))}
     </>
@@ -121,7 +122,7 @@ export default function SpaceBackground() {
   // Main stars - closer, brighter
   const starsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const starCount = 2000;
+    const starCount = 3000;
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
@@ -130,7 +131,7 @@ export default function SpaceBackground() {
       // Spherical distribution
       const radius = 50 + Math.random() * 100;
       const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos((Math.random() * 2) - 1);
+      const phi = Math.acos(Math.random() * 2 - 1);
 
       positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
       positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
@@ -158,9 +159,9 @@ export default function SpaceBackground() {
       sizes[i] = Math.random() * 0.5 + 0.1;
     }
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
 
     return geometry;
   }, []);
@@ -174,14 +175,14 @@ export default function SpaceBackground() {
     for (let i = 0; i < starCount; i++) {
       const radius = 150 + Math.random() * 200;
       const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos((Math.random() * 2) - 1);
+      const phi = Math.acos(Math.random() * 2 - 1);
 
       positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
       positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = radius * Math.cos(phi);
     }
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     return geometry;
   }, []);

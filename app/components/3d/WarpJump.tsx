@@ -22,7 +22,7 @@ export default function WarpJump({
 
   // Create star field for warp effect
   const { positions, velocities } = useMemo(() => {
-    const count = 2500;
+    const count = 2000;
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count);
 
