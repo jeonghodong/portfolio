@@ -112,7 +112,7 @@ export const WARP_CONFIG = {
   WARP_SPEED_MULTIPLIER: 10,
 
   // TV effect timing
-  TV_TURNOFF_DURATION: 2000, // ms
+  TV_TURNOFF_DURATION: 1000, // ms
   TV_TURNON_DURATION: 100, // ms
   TV_TURNON_DELAY: 100, // ms
 
