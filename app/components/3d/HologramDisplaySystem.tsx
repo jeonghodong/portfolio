@@ -7,6 +7,7 @@ import HologramScreen from "./HologramScreen";
 interface HologramDisplaySystemProps {
   selectedPlanetId: string | null;
   hoveredPlanetId: string | null;
+  isWarpActive: boolean;
   onPlanetSelect: (planetId: string) => void;
   onPlanetHover: (planetId: string | null) => void;
   onPlanetEnter: (planetId: string) => void;
@@ -15,6 +16,7 @@ interface HologramDisplaySystemProps {
 export default function HologramDisplaySystem({
   selectedPlanetId,
   hoveredPlanetId,
+  isWarpActive,
   onPlanetSelect,
   onPlanetHover,
   onPlanetEnter,
@@ -67,6 +69,7 @@ export default function HologramDisplaySystem({
           rotation={screen.rotation}
           isSelected={selectedPlanetId === screen.planet.id}
           isHovered={hoveredPlanetId === screen.planet.id}
+          isWarpActive={isWarpActive}
           onSelect={() => onPlanetSelect(screen.planet.id)}
           onHover={(hovered) =>
             onPlanetHover(hovered ? screen.planet.id : null)

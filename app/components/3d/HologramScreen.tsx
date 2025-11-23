@@ -15,6 +15,7 @@ interface HologramScreenProps {
   rotation?: [number, number, number];
   isSelected: boolean;
   isHovered: boolean;
+  isWarpActive: boolean;
   onSelect: () => void;
   onHover: (hovered: boolean) => void;
   onEnter: () => void;
@@ -27,6 +28,7 @@ export default function HologramScreen({
   rotation = [0, 0, 0],
   isSelected,
   isHovered,
+  isWarpActive,
   onSelect,
   onHover,
   onEnter,
@@ -51,9 +53,8 @@ export default function HologramScreen({
   }, []);
 
   // Animation for selection - larger scale for selected
-  const { scale, glowIntensity } = useSpring({
-    scale: isSelected ? 1.4 : isHovered ? 1.08 : 1,
-    glowIntensity: isSelected ? 1.2 : isHovered ? 0.8 : 0.5,
+  const { scale } = useSpring({
+    scale: isWarpActive ? 0 : isSelected ? 1.4 : isHovered ? 1.08 : 1,
     config: { tension: 200, friction: 40 },
   });
 

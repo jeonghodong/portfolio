@@ -442,6 +442,7 @@ export default function Scene() {
                 <HologramDisplaySystem
                   selectedPlanetId={selectedPlanetId}
                   hoveredPlanetId={hoveredPlanetId}
+                  isWarpActive={isWarpActive}
                   onPlanetSelect={handlePlanetSelect}
                   onPlanetHover={setHoveredPlanetId}
                   onPlanetEnter={handlePlanetEnter}
