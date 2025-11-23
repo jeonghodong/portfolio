@@ -118,8 +118,8 @@ function SpaceXSign() {
 }
 
 export default function PlanetEasterEggs({ planet }: PlanetEasterEggsProps) {
-  // Mars-specific easter eggs
-  const isMars = planet.id === "mars";
+  // Mars-specific easter eggs (planet id "4" is Mars)
+  const isMars = planet.id === "4";
 
   if (!isMars) return null;
 

@@ -114,6 +114,7 @@ export default function Flag3D({
         anchorY="middle"
         outlineWidth={0.02}
         outlineColor="#000000"
+        raycast={() => null}
       >
         {language === "ko" ? "클릭하여 프로젝트 보기" : "Click to view project"}
       </Text>
@@ -125,6 +126,7 @@ export default function Flag3D({
         anchorY="middle"
         outlineWidth={0.02}
         outlineColor="#000000"
+        raycast={() => null}
       >
         {projectTitle}
       </Text>

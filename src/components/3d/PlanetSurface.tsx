@@ -90,11 +90,20 @@ export default function PlanetSurface({
         projectTitle={project?.title || ""}
       />
 
-      {/* Back button - floating text */}
-      <mesh position={[-8, 3, 0]} onClick={onBack}>
-        <planeGeometry args={[2, 0.8]} />
-        <meshBasicMaterial color="#ff4444" transparent opacity={0.8} />
-      </mesh>
+      {/* Back button - invisible clickable area with text */}
+      <group position={[-8, 3, 0]} onClick={onBack}>
+        <mesh
+          onPointerOver={() => {
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = "auto";
+          }}
+        >
+          <planeGeometry args={[2, 0.8]} />
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
+      </group>
 
       {/* Camera controls for exploration - touch-optimized */}
       <OrbitControls
