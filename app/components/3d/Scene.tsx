@@ -34,6 +34,7 @@ export default function Scene() {
   const [isTVShutoffActive, setIsTVShutoffActive] = useState(false);
   const [isTVTurnonActive, setIsTVTurnonActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCameraAnimating, setIsCameraAnimating] = useState(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const orbitControlsRef = useRef<any>(null);
   const { language } = useLanguage();
@@ -64,6 +65,7 @@ export default function Scene() {
         } else if (sceneMode === "surface" && !isExiting) {
           handleBackToShip();
         } else if (sceneMode === "spaceship" && selectedPlanetId) {
+          setIsCameraAnimating(true);
           setSelectedPlanetId(null);
         }
       }
@@ -76,6 +78,7 @@ export default function Scene() {
   const handlePlanetSelect = (planetId: string) => {
     setSelectedPlanetId(planetId);
     setHoveredPlanetId(planetId);
+    setIsCameraAnimating(true);
   };
 
   const handlePlanetEnter = (planetId: string) => {
@@ -113,6 +116,10 @@ export default function Scene() {
 
   const handleTVTurnonComplete = () => {
     setIsTVTurnonActive(false);
+  };
+
+  const handleCameraAnimationComplete = () => {
+    setIsCameraAnimating(false);
   };
 
   const handleBackToShip = () => {
@@ -418,6 +425,7 @@ export default function Scene() {
               selectedPlanetId &&
               !isWarpActive
             ) {
+              setIsCameraAnimating(true);
               setSelectedPlanetId(null);
               setHoveredPlanetId(null);
             }
@@ -443,9 +451,13 @@ export default function Scene() {
                   duration={2.5}
                   onComplete={handleWarpComplete}
                 />
-                <CameraAnimator selectedPlanetId={selectedPlanetId} />
+                <CameraAnimator
+                  selectedPlanetId={selectedPlanetId}
+                  orbitControlsRef={orbitControlsRef}
+                  onAnimationComplete={handleCameraAnimationComplete}
+                />
                 <MouseCameraController
-                  enabled={!selectedPlanetId && !isWarpActive}
+                  enabled={!selectedPlanetId && !isWarpActive && !isCameraAnimating}
                   maxAngle={70}
                   sensitivity={1}
                   orbitControlsRef={orbitControlsRef}

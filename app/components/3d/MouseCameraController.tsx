@@ -20,6 +20,7 @@ export default function MouseCameraController({
   const mousePosition = useRef({ x: 0, y: 0 });
   const targetRotation = useRef({ x: 0, y: 0 });
   const currentRotation = useRef({ x: 0, y: 0 });
+  const wasEnabled = useRef(enabled);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -37,23 +38,29 @@ export default function MouseCameraController({
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [enabled]);
 
+  // Reset rotation when becoming disabled
+  useEffect(() => {
+    if (wasEnabled.current && !enabled) {
+      // Just became disabled - reset rotations
+      targetRotation.current = { x: 0, y: 0 };
+      currentRotation.current = { x: 0, y: 0 };
+    }
+    wasEnabled.current = enabled;
+  }, [enabled]);
+
   useFrame(() => {
     if (!orbitControlsRef?.current) return;
+    if (!enabled) return; // Don't update anything when disabled
 
-    if (!enabled) {
-      // Reset to center when disabled
-      targetRotation.current = { x: 0, y: 0 };
-    } else {
-      // Calculate target rotation based on mouse position
-      // Convert degrees to radians
-      const maxAngleRad = (maxAngle * Math.PI) / 180;
+    // Calculate target rotation based on mouse position
+    // Convert degrees to radians
+    const maxAngleRad = (maxAngle * Math.PI) / 180;
 
-      // Horizontal rotation (left-right)
-      targetRotation.current.y = mousePosition.current.x * maxAngleRad * sensitivity;
+    // Horizontal rotation (left-right)
+    targetRotation.current.y = mousePosition.current.x * maxAngleRad * sensitivity;
 
-      // Vertical rotation (up-down)
-      targetRotation.current.x = mousePosition.current.y * maxAngleRad * sensitivity * 0.5; // Less vertical movement
-    }
+    // Vertical rotation (up-down)
+    targetRotation.current.x = mousePosition.current.y * maxAngleRad * sensitivity * 0.5; // Less vertical movement
 
     // Smooth lerp to target rotation
     const lerpFactor = 0.05;
