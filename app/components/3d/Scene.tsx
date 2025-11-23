@@ -17,6 +17,7 @@ import MouseCameraController from "./MouseCameraController";
 import PlanetSurface from "./PlanetSurface";
 import SpaceBackground from "./SpaceBackground";
 import WarpJump from "./WarpJump";
+import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
 
 type SceneMode = "spaceship" | "surface";
 
@@ -25,7 +26,6 @@ export default function Scene() {
   const [currentPlanet, setCurrentPlanet] = useState<Planet | null>(null);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [selectedPlanetId, setSelectedPlanetId] = useState<string | null>(null);
@@ -38,22 +38,12 @@ export default function Scene() {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const orbitControlsRef = useRef<any>(null);
   const { language } = useLanguage();
+  const { isMobile, maxDPR, enableAntialiasing, cameraFOV } = useMobileOptimization();
 
   // Hide loading after initial render
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
-  }, []);
-
-  // Detect mobile device
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 768 || "ontouchstart" in window;
-      setIsMobile(mobile);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Handle ESC key to go back
@@ -218,12 +208,15 @@ export default function Scene() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           onClick={handleBackToShip}
-          className="fixed top-6 left-6 z-30 bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg text-white/80 hover:text-white hover:bg-black/70 transition-colors flex items-center gap-2"
+          className="fixed top-3 left-3 sm:top-6 sm:left-6 z-30 bg-black/50 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base text-white/80 hover:text-white hover:bg-black/70 transition-colors flex items-center gap-1.5 sm:gap-2"
           aria-label={language === "ko" ? "우주선으로 복귀" : "Return to Ship"}
         >
           <span aria-hidden="true">←</span>
-          <span>
+          <span className="hidden sm:inline">
             {language === "ko" ? "우주선으로 복귀" : "Return to Ship"}
+          </span>
+          <span className="sm:hidden">
+            {language === "ko" ? "복귀" : "Back"}
           </span>
         </motion.button>
       )}
@@ -233,10 +226,10 @@ export default function Scene() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-6 left-1/2 -translate-x-1/2 z-30 text-white/90 text-lg font-medium tracking-wide"
+          className="fixed top-3 sm:top-6 left-1/2 -translate-x-1/2 z-30 text-white/90 text-xs sm:text-sm md:text-lg font-medium tracking-wide"
           role="status"
         >
-          <span className="bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-blue-500/30">
+          <span className="bg-black/50 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full border border-blue-500/30">
             {language === "ko"
               ? isMobile
                 ? "📡 미션을 탭하여 선택!"
@@ -253,7 +246,7 @@ export default function Scene() {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-white text-2xl font-bold tracking-widest"
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-white text-lg sm:text-xl md:text-2xl font-bold tracking-widest"
         >
           {language === "ko" ? "🚀 워프 점프!" : "🚀 Warp Jump!"}
         </motion.div>
@@ -264,7 +257,7 @@ export default function Scene() {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-white text-2xl font-bold tracking-widest"
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-white text-lg sm:text-xl md:text-2xl font-bold tracking-widest"
         >
           {language === "ko" ? "🚀 발사!" : "🚀 Launch!"}
         </motion.div>
@@ -275,11 +268,11 @@ export default function Scene() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-6 left-1/2 -translate-x-1/2 z-30 text-white/80 text-lg font-light tracking-widest"
+          className="fixed top-3 sm:top-6 left-1/2 -translate-x-1/2 z-30 text-white/80 text-sm sm:text-base md:text-lg font-light tracking-widest"
         >
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 sm:gap-2">
             <span
-              className="w-3 h-3 rounded-full animate-pulse"
+              className="w-2 h-2 sm:w-3 sm:h-3 rounded-full animate-pulse"
               style={{
                 backgroundColor: currentPlanet.environment.particleColor,
               }}
@@ -292,7 +285,7 @@ export default function Scene() {
 
       {/* Instructions */}
       <div
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 text-white/60 text-sm pointer-events-none text-center px-4"
+        className="fixed bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 text-white/60 text-xs sm:text-sm pointer-events-none text-center px-3 sm:px-4"
         role="status"
         aria-live="polite"
       >
@@ -323,17 +316,17 @@ export default function Scene() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 50 }}
               transition={{ duration: 0.3 }}
-              className="fixed right-6 top-1/2 -translate-y-1/2 z-30 w-80 max-w-[calc(100vw-3rem)]"
+              className="fixed right-3 sm:right-6 top-20 sm:top-24 z-30 w-[calc(100vw-1.5rem)] sm:w-80 max-w-sm"
             >
-              <div className="bg-black/70 backdrop-blur-md rounded-xl p-5 border border-blue-500/20">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="bg-black/70 backdrop-blur-md rounded-xl p-3 sm:p-5 border border-blue-500/20">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <span
                     className="w-2 h-2 rounded-full animate-pulse"
                     style={{
                       backgroundColor: hoveredPlanet?.environment.particleColor,
                     }}
                   />
-                  <span className="text-white/60 text-sm uppercase tracking-wide">
+                  <span className="text-white/60 text-xs sm:text-sm uppercase tracking-wide">
                     {hoveredProject
                       ? language === "ko"
                         ? "프로젝트 미션"
@@ -343,7 +336,7 @@ export default function Scene() {
                       : "Exploration Mission"}
                   </span>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-1.5 sm:mb-2">
                   {hoveredProject
                     ? language === "ko"
                       ? hoveredProject.title_ko
@@ -352,7 +345,7 @@ export default function Scene() {
                     ? hoveredPlanet?.name_ko
                     : hoveredPlanet?.name_en}
                 </h3>
-                <p className="text-white/70 text-sm mb-4 line-clamp-3">
+                <p className="text-white/70 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3">
                   {hoveredProject
                     ? language === "ko"
                       ? hoveredProject.description_ko
@@ -417,8 +410,8 @@ export default function Scene() {
       {/* 3D Canvas */}
       <div ref={canvasContainerRef} className="fixed inset-0">
         <Canvas
-          gl={{ antialias: true, alpha: true }}
-          dpr={[1, isMobile ? 1.5 : 2]}
+          gl={{ antialias: enableAntialiasing, alpha: true }}
+          dpr={[1, maxDPR]}
           onPointerMissed={() => {
             if (
               sceneMode === "spaceship" &&
@@ -435,7 +428,11 @@ export default function Scene() {
             <>
               <color attach="background" args={["#0a0e1a"]} />
 
-              <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={45} />
+              <PerspectiveCamera
+                makeDefault
+                position={[0, 0, isMobile ? 12 : 10]}
+                fov={cameraFOV}
+              />
 
               <Suspense fallback={null}>
                 <SpaceBackground />
@@ -467,23 +464,25 @@ export default function Scene() {
                 />
               </Suspense>
 
-              {/* Camera controls - zoom, pan, and rotate enabled */}
+              {/* Camera controls - touch-optimized for mobile */}
               <OrbitControls
                 ref={orbitControlsRef}
                 enabled={!selectedPlanetId}
                 enableZoom={true}
-                enablePan={true}
+                enablePan={!isMobile} // Disable pan on mobile for simpler controls
                 enableRotate={true}
-                zoomSpeed={0.6}
-                rotateSpeed={0.5}
+                zoomSpeed={isMobile ? 0.8 : 0.6}
+                rotateSpeed={isMobile ? 0.7 : 0.5}
                 panSpeed={0.4}
-                minDistance={5}
-                maxDistance={25}
+                minDistance={isMobile ? 4 : 5}
+                maxDistance={isMobile ? 30 : 25}
                 maxPolarAngle={Math.PI / 2 + (70 * Math.PI) / 180}
                 minPolarAngle={Math.PI / 2 - (70 * Math.PI) / 180}
                 maxAzimuthAngle={(70 * Math.PI) / 180}
                 minAzimuthAngle={-(70 * Math.PI) / 180}
                 target={[0, 0, -6]}
+                enableDamping={true}
+                dampingFactor={0.05}
               />
             </>
           ) : (
@@ -530,9 +529,9 @@ export default function Scene() {
                 stiffness: 300,
                 delay: 0.2,
               }}
-              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none p-4 sm:p-10"
+              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none p-3 sm:p-6 md:p-10"
             >
-              <div className="pointer-events-auto w-full max-w-[800px] h-full max-h-[700px]">
+              <div className="pointer-events-auto w-full max-w-[800px] h-full max-h-[95vh] sm:max-h-[90vh] md:max-h-[700px]">
                 <CardDetailContent
                   project={selectedProject}
                   onClose={handleCloseProject}

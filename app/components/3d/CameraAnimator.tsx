@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
 import { planets } from "@/app/lib/data";
+import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
 
 interface CameraAnimatorProps {
   selectedPlanetId: string | null;
@@ -17,23 +18,28 @@ export default function CameraAnimator({
   onAnimationComplete,
 }: CameraAnimatorProps) {
   const { camera } = useThree();
-  const targetPosition = useRef(new Vector3(0, 0, 10));
-  const originalPosition = useRef(new Vector3(0, 0, 10));
+  const { isMobile } = useMobileOptimization();
+
+  // Mobile uses different camera distance
+  const initialZ = isMobile ? 12 : 10;
+  const targetPosition = useRef(new Vector3(0, 0, initialZ));
+  const originalPosition = useRef(new Vector3(0, 0, initialZ));
   const targetLookAt = useRef(new Vector3(0, 0, -6));
   const originalLookAt = useRef(new Vector3(0, 0, -6));
   const isAnimating = useRef(false);
 
-  // Screen positions from HologramDisplaySystem
+  // Screen positions from HologramDisplaySystem - match spacing
+  const spacing = isMobile ? 0.6 : 1.0;
   const screenPositions = [
-    { x: -7, y: 4, z: -5 },
-    { x: 0, y: 5, z: -9 },
-    { x: 7, y: 4, z: -6 },
-    { x: -6, y: 0, z: -10 },
+    { x: -7 * spacing, y: 4 * spacing, z: -5 },
+    { x: 0, y: 5 * spacing, z: -9 },
+    { x: 7 * spacing, y: 4 * spacing, z: -6 },
+    { x: -6 * spacing, y: 0, z: -10 },
     { x: 0, y: 0, z: -4 },
-    { x: 6, y: 0, z: -8 },
-    { x: -7, y: -4, z: -7 },
-    { x: 0, y: -5, z: -10 },
-    { x: 7, y: -4, z: -5 },
+    { x: 6 * spacing, y: 0, z: -8 },
+    { x: -7 * spacing, y: -4 * spacing, z: -7 },
+    { x: 0, y: -5 * spacing, z: -10 },
+    { x: 7 * spacing, y: -4 * spacing, z: -5 },
   ];
 
   useEffect(() => {
@@ -43,11 +49,14 @@ export default function CameraAnimator({
       if (planetIndex !== -1 && screenPositions[planetIndex]) {
         const screenPos = screenPositions[planetIndex];
 
+        // Adjust zoom distance based on device
+        const zoomDistance = isMobile ? 8 : 10;
+
         // Position camera at same x, y as screen, but in front on z-axis
         targetPosition.current.set(
           screenPos.x, // Same x as screen
           screenPos.y, // Same y as screen
-          screenPos.z + 10 // 3.5 units in front of screen for better framing
+          screenPos.z + zoomDistance // Closer on mobile for tighter view
         );
 
         // Set look at target to screen center
@@ -61,7 +70,7 @@ export default function CameraAnimator({
       targetLookAt.current.copy(originalLookAt.current);
       isAnimating.current = true;
     }
-  }, [selectedPlanetId]);
+  }, [selectedPlanetId, isMobile, screenPositions]);
 
   useFrame(() => {
     if (isAnimating.current) {

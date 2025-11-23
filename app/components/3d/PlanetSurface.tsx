@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { Planet, Project } from '@/app/types';
 import Flag3D from './Flag3D';
 import { useLanguage } from '@/app/contexts/LanguageContext';
+import { useMobileOptimization } from '@/app/hooks/useMobileOptimization';
 
 // Doge Billboard component for Mars
 function DogeBillboard() {
@@ -117,11 +118,12 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
   const { language } = useLanguage();
   const { pointer, camera, raycaster } = useThree();
   const groundPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
+  const { particleMultiplier, geometryDetail, enableShadows, isMobile, cameraFOV } = useMobileOptimization();
 
-  // Generate terrain particles/dust
+  // Generate terrain particles/dust (800 desktop, 200 mobile, 400 tablet)
   const particlesGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const count = 800;
+    const count = Math.floor(800 * particleMultiplier);
     const positions = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
@@ -135,11 +137,12 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     return geometry;
-  }, []);
+  }, [particleMultiplier]);
 
-  // Generate circular terrain with height variation
+  // Generate circular terrain with height variation (64 desktop, 32 mobile, 48 tablet)
   const terrainGeometry = useMemo(() => {
-    const geometry = new THREE.CircleGeometry(50, 64, 0, Math.PI * 2);
+    const segments = geometryDetail === 'low' ? 32 : geometryDetail === 'medium' ? 48 : 64;
+    const geometry = new THREE.CircleGeometry(50, segments, 0, Math.PI * 2);
     geometry.rotateX(-Math.PI / 2);
 
     // Add height variation to vertices
@@ -160,7 +163,7 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
 
     geometry.computeVertexNormals();
     return geometry;
-  }, []);
+  }, [geometryDetail]);
 
   // Generate hills/mounds
   const hills = useMemo(() => {
@@ -295,10 +298,11 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
     }
   });
 
-  // Generate rocks/features based on planet - more rocks in circular pattern
+  // Generate rocks/features based on planet - more rocks in circular pattern (40 desktop, 20 mobile, 30 tablet)
   const rocks = useMemo(() => {
     const rockData: { position: [number, number, number]; scale: number; rotation: number }[] = [];
-    for (let i = 0; i < 40; i++) {
+    const rockCount = isMobile ? 20 : Math.floor(40 * particleMultiplier);
+    for (let i = 0; i < rockCount; i++) {
       const angle = Math.random() * Math.PI * 2;
       const radius = 3 + Math.random() * 25;
       rockData.push({
@@ -312,12 +316,13 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
       });
     }
     return rockData;
-  }, []);
+  }, [isMobile, particleMultiplier]);
 
-  // Generate small pebbles for detail
+  // Generate small pebbles for detail (100 desktop, 30 mobile, 50 tablet)
   const pebbles = useMemo(() => {
     const pebbleData: { position: [number, number, number]; scale: number }[] = [];
-    for (let i = 0; i < 100; i++) {
+    const pebbleCount = isMobile ? 30 : Math.floor(100 * particleMultiplier);
+    for (let i = 0; i < pebbleCount; i++) {
       const angle = Math.random() * Math.PI * 2;
       const radius = Math.random() * 30;
       pebbleData.push({
@@ -330,12 +335,12 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
       });
     }
     return pebbleData;
-  }, []);
+  }, [isMobile, particleMultiplier]);
 
   return (
     <>
-      {/* Camera for surface exploration */}
-      <PerspectiveCamera makeDefault position={[5, 3, 8]} fov={60} />
+      {/* Camera for surface exploration (wider FOV on mobile: 75° vs 60°) */}
+      <PerspectiveCamera makeDefault position={[5, 3, 8]} fov={cameraFOV} />
 
       {/* Sky/atmosphere based on planet */}
       <color attach="background" args={[planet.environment.skyColor]} />
@@ -347,12 +352,12 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
         position={[10, 20, 10]}
         intensity={1.2}
         color="#ffffff"
-        castShadow
+        castShadow={enableShadows}
       />
       <pointLight position={[-10, 10, -10]} intensity={0.5} color={planet.environment.ambientColor} />
 
       {/* Circular ground with terrain variation */}
-      <mesh geometry={terrainGeometry} receiveShadow>
+      <mesh geometry={terrainGeometry} receiveShadow={enableShadows}>
         <meshStandardMaterial
           color={planet.environment.groundColor}
           roughness={0.9}
@@ -362,7 +367,7 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
 
       {/* Hills/mounds for depth */}
       {hills.map((hill, i) => (
-        <mesh key={`hill-${i}`} position={hill.position} scale={hill.scale} castShadow>
+        <mesh key={`hill-${i}`} position={hill.position} scale={hill.scale} castShadow={enableShadows}>
           <sphereGeometry args={[1, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshStandardMaterial
             color={planet.environment.groundColor}
@@ -377,7 +382,7 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
           key={`rock-${i}`}
           position={rock.position}
           rotation={[0, rock.rotation, Math.random() * 0.3]}
-          castShadow
+          castShadow={enableShadows}
         >
           <dodecahedronGeometry args={[rock.scale, 0]} />
           <meshStandardMaterial
@@ -529,16 +534,24 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
         )}
       </group>
 
-      {/* Camera controls for exploration */}
+      {/* Camera controls for exploration - touch-optimized */}
       <OrbitControls
         enableZoom={true}
         enablePan={false}
         enableRotate={true}
+        zoomSpeed={isMobile ? 0.8 : 1.0}
+        rotateSpeed={isMobile ? 0.7 : 1.0}
         maxPolarAngle={Math.PI / 2 - 0.1}
         minPolarAngle={0.3}
         minDistance={3}
         maxDistance={20}
         target={[0, 1, 0]}
+        enableDamping={true}
+        dampingFactor={0.05}
+        touches={{
+          ONE: THREE.TOUCH.ROTATE,
+          TWO: THREE.TOUCH.DOLLY_PAN
+        }}
       />
     </>
   );

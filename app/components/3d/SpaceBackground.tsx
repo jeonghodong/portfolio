@@ -3,6 +3,7 @@
 import { useRef, useMemo, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
 
 // Shooting star component
 function ShootingStar({ onComplete }: { onComplete: () => void }) {
@@ -119,11 +120,12 @@ export default function SpaceBackground() {
   const starsRef = useRef<THREE.Points>(null);
   const distantStarsRef = useRef<THREE.Points>(null);
   const dustRef = useRef<THREE.Points>(null);
+  const { particleMultiplier } = useMobileOptimization();
 
-  // Main stars - closer, brighter (increased from 3000 to 8000)
+  // Main stars - closer, brighter (8000 desktop, 1600 mobile, 4000 tablet)
   const starsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const starCount = 8000;
+    const starCount = Math.floor(8000 * particleMultiplier);
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
@@ -165,12 +167,12 @@ export default function SpaceBackground() {
     geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
 
     return geometry;
-  }, []);
+  }, [particleMultiplier]);
 
-  // Distant stars - farther, dimmer, more numerous (increased from 5000 to 12000)
+  // Distant stars - farther, dimmer, more numerous (12000 desktop, 2400 mobile, 6000 tablet)
   const distantStarsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const starCount = 12000;
+    const starCount = Math.floor(12000 * particleMultiplier);
     const positions = new Float32Array(starCount * 3);
 
     for (let i = 0; i < starCount; i++) {
@@ -186,12 +188,12 @@ export default function SpaceBackground() {
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     return geometry;
-  }, []);
+  }, [particleMultiplier]);
 
-  // Space dust particles
+  // Space dust particles (10000 desktop, 2000 mobile, 5000 tablet)
   const dustGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const dustCount = 10000;
+    const dustCount = Math.floor(10000 * particleMultiplier);
     const positions = new Float32Array(dustCount * 3);
 
     for (let i = 0; i < dustCount; i++) {
@@ -207,7 +209,7 @@ export default function SpaceBackground() {
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     return geometry;
-  }, []);
+  }, [particleMultiplier]);
 
   // Enhanced animations for stars and dust
   useFrame((state, delta) => {

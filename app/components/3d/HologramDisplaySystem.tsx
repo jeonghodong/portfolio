@@ -3,6 +3,7 @@
 import { Planet, Project } from "@/app/types";
 import { planets, projects } from "@/app/lib/data";
 import HologramScreen from "./HologramScreen";
+import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
 
 interface HologramDisplaySystemProps {
   selectedPlanetId: string | null;
@@ -21,6 +22,8 @@ export default function HologramDisplaySystem({
   onPlanetHover,
   onPlanetEnter,
 }: HologramDisplaySystemProps) {
+  const { isMobile } = useMobileOptimization();
+
   // All planets in a single grid on front wall
   const allPlanets = planets.map((planet) => {
     const project = projects.find((p) => p.id === planet.id) || null;
@@ -28,21 +31,24 @@ export default function HologramDisplaySystem({
   });
 
   // 3D spatial arrangement - screens floating in space with depth
+  // Mobile: tighter spacing to fit all screens in view
+  const spacing = isMobile ? 0.6 : 1.0; // 60% spacing on mobile
+
   const screenPositions = [
     // Top row - varying depths
-    { x: -7, y: 4, z: -5 },
-    { x: 0, y: 5, z: -9 },
-    { x: 7, y: 4, z: -6 },
+    { x: -7 * spacing, y: 4 * spacing, z: -5 },
+    { x: 0, y: 5 * spacing, z: -9 },
+    { x: 7 * spacing, y: 4 * spacing, z: -6 },
 
     // Middle row - varying depths
-    { x: -6, y: 0, z: -10 },
+    { x: -6 * spacing, y: 0, z: -10 },
     { x: 0, y: 0, z: -4 },
-    { x: 6, y: 0, z: -8 },
+    { x: 6 * spacing, y: 0, z: -8 },
 
     // Bottom row - varying depths
-    { x: -7, y: -4, z: -7 },
-    { x: 0, y: -5, z: -10 },
-    { x: 7, y: -4, z: -5 },
+    { x: -7 * spacing, y: -4 * spacing, z: -7 },
+    { x: 0, y: -5 * spacing, z: -10 },
+    { x: 7 * spacing, y: -4 * spacing, z: -5 },
   ];
 
   const frontWallScreens = allPlanets.map(({ planet, project }, index) => {
