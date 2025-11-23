@@ -246,8 +246,8 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
       const distToTarget = currentPos.distanceTo(targetPosition.current);
 
       if (distToTarget > 0.1) {
-        // Running
-        const moveSpeed = 3;
+        // Moon walking - slow bouncing movement
+        const moveSpeed = 1.5; // Slower movement like on moon
         const direction = targetPosition.current.clone().sub(currentPos).normalize();
         currentPos.add(direction.multiplyScalar(Math.min(moveSpeed * delta, distToTarget)));
 
@@ -255,15 +255,17 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
         const angle = Math.atan2(direction.x, direction.z);
         astronautRef.current.rotation.y = angle;
 
-        // Run animation
-        runAnimationTime.current += delta * 12;
+        // Moon walk animation - slower, bouncier
+        runAnimationTime.current += delta * 4; // Slower animation
         if (leftLegRef.current && rightLegRef.current) {
-          leftLegRef.current.rotation.x = Math.sin(runAnimationTime.current) * 0.6;
-          rightLegRef.current.rotation.x = Math.sin(runAnimationTime.current + Math.PI) * 0.6;
+          // Alternating legs with slower swing
+          leftLegRef.current.rotation.x = Math.sin(runAnimationTime.current) * 0.4;
+          rightLegRef.current.rotation.x = Math.sin(runAnimationTime.current + Math.PI) * 0.4;
         }
 
-        // Slight body bob
-        astronautRef.current.position.y = Math.abs(Math.sin(runAnimationTime.current)) * 0.1;
+        // Bouncy hop - like moon gravity
+        const hopCycle = Math.sin(runAnimationTime.current);
+        astronautRef.current.position.y = hopCycle > 0 ? hopCycle * 0.3 : 0; // Higher bounce
 
         if (!isRunning) setIsRunning(true);
       } else {
@@ -501,30 +503,28 @@ export default function PlanetSurface({ planet, project, onFlagClick, onBack, is
           </mesh>
         </group>
 
-        {/* Jetpack flames when landing, exiting, or running */}
-        {(isExiting || showLandingFlames || isRunning) && (
+        {/* Jetpack flames when landing or exiting only */}
+        {(isExiting || showLandingFlames) && (
           <>
             <pointLight
               position={[0, -0.5, 0]}
               color="#ff4400"
-              intensity={isRunning ? 2 : 5}
-              distance={isRunning ? 4 : 8}
+              intensity={5}
+              distance={8}
             />
             <mesh position={[0.08, 0.1, -0.2]}>
-              <coneGeometry args={[isRunning ? 0.04 : 0.08, isRunning ? 0.3 : 0.6, 8]} />
+              <coneGeometry args={[0.08, 0.6, 8]} />
               <meshBasicMaterial color="#ff6600" transparent opacity={0.9} />
             </mesh>
             <mesh position={[-0.08, 0.1, -0.2]}>
-              <coneGeometry args={[isRunning ? 0.04 : 0.08, isRunning ? 0.3 : 0.6, 8]} />
+              <coneGeometry args={[0.08, 0.6, 8]} />
               <meshBasicMaterial color="#ff6600" transparent opacity={0.9} />
             </mesh>
-            {/* Smoke trail - only for landing/exiting */}
-            {!isRunning && (
-              <mesh position={[0, -0.3, -0.2]}>
-                <sphereGeometry args={[0.15, 16, 16]} />
-                <meshBasicMaterial color="#888888" transparent opacity={0.5} />
-              </mesh>
-            )}
+            {/* Smoke trail */}
+            <mesh position={[0, -0.3, -0.2]}>
+              <sphereGeometry args={[0.15, 16, 16]} />
+              <meshBasicMaterial color="#888888" transparent opacity={0.5} />
+            </mesh>
           </>
         )}
       </group>

@@ -180,7 +180,7 @@ export default function Scene() {
       {/* TV Turnon Effect Overlay */}
       <TVTurnonOverlay
         isActive={isTVTurnonActive}
-        duration={sceneMode === "spaceship" ? 0.8 : 2.0}
+        duration={sceneMode === "spaceship" ? 0.6 : 2.0}
         onComplete={handleTVTurnonComplete}
         skipTwoStage={sceneMode === "spaceship"}
       />
@@ -458,7 +458,9 @@ export default function Scene() {
                   onAnimationComplete={handleCameraAnimationComplete}
                 />
                 <MouseCameraController
-                  enabled={!selectedPlanetId && !isWarpActive && !isCameraAnimating}
+                  enabled={
+                    !selectedPlanetId && !isWarpActive && !isCameraAnimating
+                  }
                   maxAngle={70}
                   sensitivity={1}
                   orbitControlsRef={orbitControlsRef}
