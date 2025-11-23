@@ -1,0 +1,71 @@
+/**
+ * Particle System Configuration
+ * Centralized constants for all particle effects
+ */
+
+export const SPACE_BACKGROUND_PARTICLES = {
+  // Main stars
+  MAIN_STAR_COUNT_BASE: 8000,
+  MAIN_STAR_SIZE_MIN: 0.5,
+  MAIN_STAR_SIZE_MAX: 2,
+  MAIN_STAR_SPEED: 0.05,
+  MAIN_STAR_RADIUS: 100,
+
+  // Distant stars
+  DISTANT_STAR_COUNT_BASE: 12000,
+  DISTANT_STAR_SIZE_MIN: 0.3,
+  DISTANT_STAR_SIZE_MAX: 1,
+  DISTANT_STAR_SPEED: 0.02,
+  DISTANT_STAR_RADIUS: 150,
+
+  // Dust particles
+  DUST_COUNT_BASE: 10000,
+  DUST_SIZE_MIN: 0.1,
+  DUST_SIZE_MAX: 0.5,
+  DUST_SPEED: 0.03,
+  DUST_RADIUS: 120,
+
+  // Animation
+  ROTATION_SPEED_Y: 0.0001,
+  ROTATION_SPEED_X: 0.00005,
+} as const;
+
+export const PLANET_SURFACE_PARTICLES = {
+  // Terrain surface particles
+  PARTICLE_COUNT_BASE: 800,
+  PARTICLE_RADIUS: 20,
+  PARTICLE_SIZE_MIN: 0.02,
+  PARTICLE_SIZE_MAX: 0.1,
+  PARTICLE_HEIGHT_MIN: 0.1,
+  PARTICLE_HEIGHT_MAX: 0.3,
+
+  // Particle animation
+  PARTICLE_FLOAT_SPEED: 0.5,
+  PARTICLE_FLOAT_AMPLITUDE_MIN: 0.02,
+  PARTICLE_FLOAT_AMPLITUDE_MAX: 0.05,
+} as const;
+
+export const WARP_PARTICLES = {
+  // Star streak effect during warp
+  STREAK_COUNT: 200,
+  STREAK_LENGTH: 5,
+  STREAK_SPEED_BASE: 2,
+  STREAK_SPEED_MULTIPLIER: 10,
+  STREAK_RADIUS: 50,
+  STREAK_SIZE: 0.1,
+} as const;
+
+export const JETPACK_PARTICLES = {
+  // Flame particles
+  FLAME_COUNT: 20,
+  FLAME_SIZE: 0.15,
+  FLAME_SPREAD: 0.1,
+  FLAME_SPEED: 0.2,
+  FLAME_LIFETIME: 500, // ms
+  FLAME_COLOR: "#ff6600",
+
+  // Smoke trail
+  SMOKE_SIZE: 0.2,
+  SMOKE_FADE_SPEED: 0.0003,
+  SMOKE_COLOR: "#666666",
+} as const;

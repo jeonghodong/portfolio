@@ -2,12 +2,12 @@
 
 import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
 
 interface MouseCameraControllerProps {
   enabled: boolean;
   maxAngle?: number; // degrees
   sensitivity?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   orbitControlsRef?: React.RefObject<any>;
 }
 

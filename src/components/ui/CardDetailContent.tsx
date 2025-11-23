@@ -1,7 +1,7 @@
 "use client";
 
-import type { Project } from "@/app/types";
-import { useLanguage } from "@/app/contexts/LanguageContext";
+import type { Project } from "@/src/types";
+import { useLanguage } from "@/src/contexts/LanguageContext";
 import Image from "next/image";
 
 interface CardDetailContentProps {

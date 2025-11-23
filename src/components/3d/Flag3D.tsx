@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
-import * as THREE from 'three';
-import { useLanguage } from '@/app/contexts/LanguageContext';
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Text } from "@react-three/drei";
+import * as THREE from "three";
+import { useLanguage } from "@/src/contexts/LanguageContext";
 
 interface Flag3DProps {
   position: [number, number, number];
@@ -13,7 +13,11 @@ interface Flag3DProps {
   projectTitle: string;
 }
 
-export default function Flag3D({ position, onClick, planetName, projectTitle }: Flag3DProps) {
+export default function Flag3D({
+  position,
+  onClick,
+  projectTitle,
+}: Flag3DProps) {
   const groupRef = useRef<THREE.Group>(null);
   const flagRef = useRef<THREE.Mesh>(null);
   const { language } = useLanguage();
@@ -60,10 +64,10 @@ export default function Flag3D({ position, onClick, planetName, projectTitle }: 
         onClick();
       }}
       onPointerOver={() => {
-        document.body.style.cursor = 'pointer';
+        document.body.style.cursor = "pointer";
       }}
       onPointerOut={() => {
-        document.body.style.cursor = 'auto';
+        document.body.style.cursor = "auto";
       }}
     >
       {/* Flag pole */}
@@ -111,7 +115,7 @@ export default function Flag3D({ position, onClick, planetName, projectTitle }: 
         outlineWidth={0.02}
         outlineColor="#000000"
       >
-        {language === 'ko' ? '클릭하여 프로젝트 보기' : 'Click to view project'}
+        {language === "ko" ? "클릭하여 프로젝트 보기" : "Click to view project"}
       </Text>
       <Text
         position={[0, 3.5, 0]}

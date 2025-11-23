@@ -3,11 +3,14 @@
 import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
-import { planets } from "@/app/lib/data";
-import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
+import { planets } from "@/src/lib/data";
+import { useMobileOptimization } from "@/src/hooks/useMobileOptimization";
+import { CAMERA_CONFIG, HOLOGRAM_CONFIG } from "@/src/constants/3d-config";
+import { HOLOGRAM_SCREEN_POSITIONS } from "@/src/constants/ui-config";
 
 interface CameraAnimatorProps {
   selectedPlanetId: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   orbitControlsRef?: React.RefObject<any>;
   onAnimationComplete?: () => void;
 }
@@ -21,26 +24,24 @@ export default function CameraAnimator({
   const { isMobile } = useMobileOptimization();
 
   // Mobile uses different camera distance
-  const initialZ = isMobile ? 12 : 10;
+  const initialZ = isMobile
+    ? CAMERA_CONFIG.INITIAL_Z_MOBILE
+    : CAMERA_CONFIG.INITIAL_Z_DESKTOP;
   const targetPosition = useRef(new Vector3(0, 0, initialZ));
   const originalPosition = useRef(new Vector3(0, 0, initialZ));
-  const targetLookAt = useRef(new Vector3(0, 0, -6));
-  const originalLookAt = useRef(new Vector3(0, 0, -6));
+  const targetLookAt = useRef(new Vector3(...CAMERA_CONFIG.INITIAL_LOOK_AT));
+  const originalLookAt = useRef(new Vector3(...CAMERA_CONFIG.INITIAL_LOOK_AT));
   const isAnimating = useRef(false);
 
   // Screen positions from HologramDisplaySystem - match spacing
-  const spacing = isMobile ? 0.6 : 1.0;
-  const screenPositions = [
-    { x: -7 * spacing, y: 4 * spacing, z: -5 },
-    { x: 0, y: 5 * spacing, z: -9 },
-    { x: 7 * spacing, y: 4 * spacing, z: -6 },
-    { x: -6 * spacing, y: 0, z: -10 },
-    { x: 0, y: 0, z: -4 },
-    { x: 6 * spacing, y: 0, z: -8 },
-    { x: -7 * spacing, y: -4 * spacing, z: -7 },
-    { x: 0, y: -5 * spacing, z: -10 },
-    { x: 7 * spacing, y: -4 * spacing, z: -5 },
-  ];
+  const spacing = isMobile
+    ? HOLOGRAM_CONFIG.SPACING_MOBILE
+    : HOLOGRAM_CONFIG.SPACING_DESKTOP;
+  const screenPositions = HOLOGRAM_SCREEN_POSITIONS.POSITIONS.map((pos) => ({
+    x: pos.x * spacing,
+    y: pos.y * spacing,
+    z: pos.z,
+  }));
 
   useEffect(() => {
     if (selectedPlanetId) {
@@ -50,7 +51,9 @@ export default function CameraAnimator({
         const screenPos = screenPositions[planetIndex];
 
         // Adjust zoom distance based on device
-        const zoomDistance = isMobile ? 8 : 10;
+        const zoomDistance = isMobile
+          ? CAMERA_CONFIG.ZOOM_DISTANCE_MOBILE
+          : CAMERA_CONFIG.ZOOM_DISTANCE_DESKTOP;
 
         // Position camera at same x, y as screen, but in front on z-axis
         targetPosition.current.set(
@@ -75,11 +78,14 @@ export default function CameraAnimator({
   useFrame(() => {
     if (isAnimating.current) {
       // Smooth lerp animation for camera position
-      camera.position.lerp(targetPosition.current, 0.1);
+      camera.position.lerp(targetPosition.current, CAMERA_CONFIG.LERP_SPEED);
 
       // Smooth lerp animation for OrbitControls target (where camera looks)
       if (orbitControlsRef?.current) {
-        orbitControlsRef.current.target.lerp(targetLookAt.current, 0.1);
+        orbitControlsRef.current.target.lerp(
+          targetLookAt.current,
+          CAMERA_CONFIG.LERP_SPEED
+        );
         orbitControlsRef.current.update();
       }
 
@@ -89,7 +95,10 @@ export default function CameraAnimator({
         ? orbitControlsRef.current.target.distanceTo(targetLookAt.current)
         : 0;
 
-      if (distance < 0.01 && targetDistance < 0.01) {
+      if (
+        distance < CAMERA_CONFIG.ANIMATION_THRESHOLD &&
+        targetDistance < CAMERA_CONFIG.ANIMATION_THRESHOLD
+      ) {
         camera.position.copy(targetPosition.current);
         if (orbitControlsRef?.current) {
           orbitControlsRef.current.target.copy(targetLookAt.current);

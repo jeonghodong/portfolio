@@ -5,8 +5,8 @@ import { useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import { useSpring, animated } from "@react-spring/three";
 import * as THREE from "three";
-import { Planet, Project } from "@/app/types";
-import { useLanguage } from "@/app/contexts/LanguageContext";
+import { Planet, Project } from "@/src/types";
+import { useLanguage } from "@/src/contexts/LanguageContext";
 
 interface HologramScreenProps {
   planet: Planet;

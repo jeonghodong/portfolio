@@ -1,8 +1,11 @@
 "use client";
 
-import { useLanguage } from "@/app/contexts/LanguageContext";
-import { planets, projects } from "@/app/lib/data";
-import type { Planet, Project } from "@/app/types";
+import { CAMERA_CONFIG, WARP_CONFIG } from "@/src/constants/3d-config";
+import { TRANSITION_TIMING } from "@/src/constants/animation-config";
+import { useLanguage } from "@/src/contexts/LanguageContext";
+import { useMobileOptimization } from "@/src/hooks/useMobileOptimization";
+import { planets, projects } from "@/src/lib/data";
+import type { Planet, Project } from "@/src/types";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,7 +20,6 @@ import MouseCameraController from "./MouseCameraController";
 import PlanetSurface from "./PlanetSurface";
 import SpaceBackground from "./SpaceBackground";
 import WarpJump from "./WarpJump";
-import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
 
 type SceneMode = "spaceship" | "surface";
 
@@ -36,9 +38,11 @@ export default function Scene() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCameraAnimating, setIsCameraAnimating] = useState(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const orbitControlsRef = useRef<any>(null);
   const { language } = useLanguage();
-  const { isMobile, maxDPR, enableAntialiasing, cameraFOV } = useMobileOptimization();
+  const { isMobile, maxDPR, enableAntialiasing, cameraFOV } =
+    useMobileOptimization();
 
   // Hide loading after initial render
   useEffect(() => {
@@ -135,8 +139,8 @@ export default function Scene() {
       setTimeout(() => {
         setIsTVShutoffActive(false);
         setIsTVTurnonActive(true);
-      }, 300);
-    }, 2500); // 1000ms exit + 1000ms TV effect + 500ms buffer
+      }, WARP_CONFIG.TV_TURNON_DELAY);
+    }, WARP_CONFIG.TV_TURNOFF_DURATION + TRANSITION_TIMING.PLANET_EXIT_DURATION / 2);
   };
 
   const handleFlagClick = () => {
@@ -356,14 +360,16 @@ export default function Scene() {
                 </p>
                 {hoveredProject && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
-                    {hoveredProject.technologies.slice(0, 4).map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-2 py-0.5 bg-white/10 rounded text-xs text-white/80"
-                      >
-                        {tech}
-                      </span>
-                    ))}
+                    {hoveredProject.technologies
+                      .slice(0, 4)
+                      .map((tech: string) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-0.5 bg-white/10 rounded text-xs text-white/80"
+                        >
+                          {tech}
+                        </span>
+                      ))}
                     {hoveredProject.technologies.length > 4 && (
                       <span className="px-2 py-0.5 text-xs text-white/50">
                         +{hoveredProject.technologies.length - 4}
@@ -430,7 +436,13 @@ export default function Scene() {
 
               <PerspectiveCamera
                 makeDefault
-                position={[0, 0, isMobile ? 12 : 10]}
+                position={[
+                  0,
+                  0,
+                  isMobile
+                    ? CAMERA_CONFIG.INITIAL_Z_MOBILE
+                    : CAMERA_CONFIG.INITIAL_Z_DESKTOP,
+                ]}
                 fov={cameraFOV}
               />
 
@@ -471,18 +483,34 @@ export default function Scene() {
                 enableZoom={true}
                 enablePan={!isMobile} // Disable pan on mobile for simpler controls
                 enableRotate={true}
-                zoomSpeed={isMobile ? 0.8 : 0.6}
-                rotateSpeed={isMobile ? 0.7 : 0.5}
+                zoomSpeed={
+                  isMobile
+                    ? CAMERA_CONFIG.ZOOM_SPEED_MOBILE
+                    : CAMERA_CONFIG.ZOOM_SPEED_DESKTOP
+                }
+                rotateSpeed={
+                  isMobile
+                    ? CAMERA_CONFIG.ROTATE_SPEED_MOBILE
+                    : CAMERA_CONFIG.ROTATE_SPEED_DESKTOP
+                }
                 panSpeed={0.4}
-                minDistance={isMobile ? 4 : 5}
-                maxDistance={isMobile ? 30 : 25}
+                minDistance={
+                  isMobile
+                    ? CAMERA_CONFIG.MIN_DISTANCE_MOBILE
+                    : CAMERA_CONFIG.MIN_DISTANCE_DESKTOP
+                }
+                maxDistance={
+                  isMobile
+                    ? CAMERA_CONFIG.MAX_DISTANCE_MOBILE
+                    : CAMERA_CONFIG.MAX_DISTANCE_DESKTOP
+                }
                 maxPolarAngle={Math.PI / 2 + (70 * Math.PI) / 180}
                 minPolarAngle={Math.PI / 2 - (70 * Math.PI) / 180}
                 maxAzimuthAngle={(70 * Math.PI) / 180}
                 minAzimuthAngle={-(70 * Math.PI) / 180}
-                target={[0, 0, -6]}
+                target={CAMERA_CONFIG.INITIAL_LOOK_AT}
                 enableDamping={true}
-                dampingFactor={0.05}
+                dampingFactor={CAMERA_CONFIG.DAMPING_FACTOR}
               />
             </>
           ) : (

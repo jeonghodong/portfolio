@@ -1,9 +1,10 @@
 "use client";
 
-import { Planet, Project } from "@/app/types";
-import { planets, projects } from "@/app/lib/data";
+import { planets, projects } from "@/src/lib/data";
 import HologramScreen from "./HologramScreen";
-import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
+import { useMobileOptimization } from "@/src/hooks/useMobileOptimization";
+import { HOLOGRAM_CONFIG } from "@/src/constants/3d-config";
+import { HOLOGRAM_SCREEN_POSITIONS } from "@/src/constants/ui-config";
 
 interface HologramDisplaySystemProps {
   selectedPlanetId: string | null;
@@ -32,24 +33,15 @@ export default function HologramDisplaySystem({
 
   // 3D spatial arrangement - screens floating in space with depth
   // Mobile: tighter spacing to fit all screens in view
-  const spacing = isMobile ? 0.6 : 1.0; // 60% spacing on mobile
+  const spacing = isMobile
+    ? HOLOGRAM_CONFIG.SPACING_MOBILE
+    : HOLOGRAM_CONFIG.SPACING_DESKTOP;
 
-  const screenPositions = [
-    // Top row - varying depths
-    { x: -7 * spacing, y: 4 * spacing, z: -5 },
-    { x: 0, y: 5 * spacing, z: -9 },
-    { x: 7 * spacing, y: 4 * spacing, z: -6 },
-
-    // Middle row - varying depths
-    { x: -6 * spacing, y: 0, z: -10 },
-    { x: 0, y: 0, z: -4 },
-    { x: 6 * spacing, y: 0, z: -8 },
-
-    // Bottom row - varying depths
-    { x: -7 * spacing, y: -4 * spacing, z: -7 },
-    { x: 0, y: -5 * spacing, z: -10 },
-    { x: 7 * spacing, y: -4 * spacing, z: -5 },
-  ];
+  const screenPositions = HOLOGRAM_SCREEN_POSITIONS.POSITIONS.map((pos) => ({
+    x: pos.x * spacing,
+    y: pos.y * spacing,
+    z: pos.z,
+  }));
 
   const frontWallScreens = allPlanets.map(({ planet, project }, index) => {
     const pos = screenPositions[index];
@@ -66,7 +58,7 @@ export default function HologramDisplaySystem({
 
   return (
     <group>
-      {allScreens.map((screen, index) => (
+      {allScreens.map((screen) => (
         <HologramScreen
           key={screen.planet.id}
           planet={screen.planet}

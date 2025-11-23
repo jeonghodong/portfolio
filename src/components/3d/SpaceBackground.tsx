@@ -3,7 +3,8 @@
 import { useRef, useMemo, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useMobileOptimization } from "@/app/hooks/useMobileOptimization";
+import { useMobileOptimization } from "@/src/hooks/useMobileOptimization";
+import { SPACE_BACKGROUND_PARTICLES } from "@/src/constants/particle-config";
 
 // Shooting star component
 function ShootingStar({ onComplete }: { onComplete: () => void }) {
@@ -122,17 +123,21 @@ export default function SpaceBackground() {
   const dustRef = useRef<THREE.Points>(null);
   const { particleMultiplier } = useMobileOptimization();
 
-  // Main stars - closer, brighter (8000 desktop, 1600 mobile, 4000 tablet)
+  // Main stars - closer, brighter
   const starsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const starCount = Math.floor(8000 * particleMultiplier);
+    const starCount = Math.floor(
+      SPACE_BACKGROUND_PARTICLES.MAIN_STAR_COUNT_BASE * particleMultiplier
+    );
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
 
     for (let i = 0; i < starCount; i++) {
       // Spherical distribution
-      const radius = 50 + Math.random() * 100;
+      const radius =
+        SPACE_BACKGROUND_PARTICLES.MAIN_STAR_RADIUS / 2 +
+        Math.random() * SPACE_BACKGROUND_PARTICLES.MAIN_STAR_RADIUS;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
@@ -159,7 +164,11 @@ export default function SpaceBackground() {
         colors[i * 3 + 2] = 0.8;
       }
 
-      sizes[i] = Math.random() * 0.5 + 0.1;
+      sizes[i] =
+        Math.random() *
+          (SPACE_BACKGROUND_PARTICLES.MAIN_STAR_SIZE_MAX -
+            SPACE_BACKGROUND_PARTICLES.MAIN_STAR_SIZE_MIN) +
+        SPACE_BACKGROUND_PARTICLES.MAIN_STAR_SIZE_MIN;
     }
 
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -169,14 +178,16 @@ export default function SpaceBackground() {
     return geometry;
   }, [particleMultiplier]);
 
-  // Distant stars - farther, dimmer, more numerous (12000 desktop, 2400 mobile, 6000 tablet)
+  // Distant stars - farther, dimmer, more numerous
   const distantStarsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const starCount = Math.floor(12000 * particleMultiplier);
+    const starCount = Math.floor(
+      SPACE_BACKGROUND_PARTICLES.DISTANT_STAR_COUNT_BASE * particleMultiplier
+    );
     const positions = new Float32Array(starCount * 3);
 
     for (let i = 0; i < starCount; i++) {
-      const radius = 150 + Math.random() * 200;
+      const radius = SPACE_BACKGROUND_PARTICLES.DISTANT_STAR_RADIUS;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
@@ -190,14 +201,18 @@ export default function SpaceBackground() {
     return geometry;
   }, [particleMultiplier]);
 
-  // Space dust particles (10000 desktop, 2000 mobile, 5000 tablet)
+  // Space dust particles
   const dustGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const dustCount = Math.floor(10000 * particleMultiplier);
+    const dustCount = Math.floor(
+      SPACE_BACKGROUND_PARTICLES.DUST_COUNT_BASE * particleMultiplier
+    );
     const positions = new Float32Array(dustCount * 3);
 
     for (let i = 0; i < dustCount; i++) {
-      const radius = 30 + Math.random() * 150;
+      const radius =
+        SPACE_BACKGROUND_PARTICLES.DUST_RADIUS / 4 +
+        Math.random() * SPACE_BACKGROUND_PARTICLES.DUST_RADIUS;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
@@ -217,8 +232,10 @@ export default function SpaceBackground() {
 
     // Parallax rotation
     if (starsRef.current) {
-      starsRef.current.rotation.y += delta * 0.002;
-      starsRef.current.rotation.x += delta * 0.001;
+      starsRef.current.rotation.y +=
+        delta * SPACE_BACKGROUND_PARTICLES.MAIN_STAR_SPEED;
+      starsRef.current.rotation.x +=
+        delta * (SPACE_BACKGROUND_PARTICLES.MAIN_STAR_SPEED / 2);
 
       // Star twinkle effect
       if (starsRef.current.material instanceof THREE.PointsMaterial) {
@@ -228,14 +245,18 @@ export default function SpaceBackground() {
     }
 
     if (distantStarsRef.current) {
-      distantStarsRef.current.rotation.y += delta * 0.001;
-      distantStarsRef.current.rotation.x += delta * 0.0005;
+      distantStarsRef.current.rotation.y +=
+        delta * SPACE_BACKGROUND_PARTICLES.DISTANT_STAR_SPEED;
+      distantStarsRef.current.rotation.x +=
+        delta * (SPACE_BACKGROUND_PARTICLES.DISTANT_STAR_SPEED / 2);
     }
 
     // Slow dust drift
     if (dustRef.current) {
-      dustRef.current.rotation.y += delta * 0.0005;
-      dustRef.current.rotation.x -= delta * 0.0003;
+      dustRef.current.rotation.y +=
+        delta * SPACE_BACKGROUND_PARTICLES.DUST_SPEED;
+      dustRef.current.rotation.x -=
+        delta * (SPACE_BACKGROUND_PARTICLES.DUST_SPEED * 0.6);
     }
   });
 
