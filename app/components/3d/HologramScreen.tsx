@@ -38,6 +38,7 @@ export default function HologramScreen({
   const frameRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [shouldShow, setShouldShow] = useState(true);
 
   // Track mouse position
   useEffect(() => {
@@ -52,9 +53,23 @@ export default function HologramScreen({
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  // Handle warp active state changes with delay for showing screens
+  useEffect(() => {
+    if (isWarpActive) {
+      // Immediately hide when warp starts
+      setShouldShow(false);
+    } else {
+      // Delay showing screens by 2 seconds after warp ends
+      const timer = setTimeout(() => {
+        setShouldShow(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isWarpActive]);
+
   // Animation for selection - larger scale for selected
   const { scale } = useSpring({
-    scale: isWarpActive ? 0 : isSelected ? 1.4 : isHovered ? 1.08 : 1,
+    scale: !shouldShow ? 0 : isSelected ? 1.4 : isHovered ? 1.08 : 1,
     config: { tension: 200, friction: 40 },
   });
 

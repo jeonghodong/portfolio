@@ -48,6 +48,17 @@ export default function TVShutoffOverlay({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
+          {/* White background behind the panels - fades in gradually */}
+          <motion.div
+            className="absolute inset-0 bg-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: duration * 0.5,
+              ease: "easeIn",
+            }}
+          />
+
           {/* Top panel - slides down */}
           <motion.div
             initial={{ y: "-50%" }}
