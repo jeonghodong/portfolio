@@ -118,11 +118,12 @@ function ShootingStars() {
 export default function SpaceBackground() {
   const starsRef = useRef<THREE.Points>(null);
   const distantStarsRef = useRef<THREE.Points>(null);
+  const dustRef = useRef<THREE.Points>(null);
 
-  // Main stars - closer, brighter
+  // Main stars - closer, brighter (increased from 3000 to 8000)
   const starsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const starCount = 3000;
+    const starCount = 8000;
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
@@ -166,10 +167,10 @@ export default function SpaceBackground() {
     return geometry;
   }, []);
 
-  // Distant stars - farther, dimmer, more numerous
+  // Distant stars - farther, dimmer, more numerous (increased from 5000 to 12000)
   const distantStarsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
-    const starCount = 5000;
+    const starCount = 12000;
     const positions = new Float32Array(starCount * 3);
 
     for (let i = 0; i < starCount; i++) {
@@ -187,26 +188,64 @@ export default function SpaceBackground() {
     return geometry;
   }, []);
 
-  // Subtle rotation for parallax effect
+  // Space dust particles
+  const dustGeometry = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    const dustCount = 10000;
+    const positions = new Float32Array(dustCount * 3);
+
+    for (let i = 0; i < dustCount; i++) {
+      const radius = 30 + Math.random() * 150;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+    }
+
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+    return geometry;
+  }, []);
+
+  // Enhanced animations for stars and dust
   useFrame((state, delta) => {
+    const time = state.clock.elapsedTime;
+
+    // Parallax rotation
     if (starsRef.current) {
       starsRef.current.rotation.y += delta * 0.002;
       starsRef.current.rotation.x += delta * 0.001;
+
+      // Star twinkle effect
+      if (starsRef.current.material instanceof THREE.PointsMaterial) {
+        const twinkle = Math.sin(time * 0.5) * 0.1 + 0.9;
+        starsRef.current.material.opacity = twinkle;
+      }
     }
+
     if (distantStarsRef.current) {
       distantStarsRef.current.rotation.y += delta * 0.001;
+      distantStarsRef.current.rotation.x += delta * 0.0005;
+    }
+
+    // Slow dust drift
+    if (dustRef.current) {
+      dustRef.current.rotation.y += delta * 0.0005;
+      dustRef.current.rotation.x -= delta * 0.0003;
     }
   });
 
   return (
     <>
-      {/* Main stars */}
+      {/* Main stars - enhanced */}
       <points ref={starsRef} geometry={starsGeometry}>
         <pointsMaterial
-          size={0.15}
+          size={0.18}
           vertexColors
           transparent
-          opacity={0.9}
+          opacity={0.95}
           sizeAttenuation
           blending={THREE.AdditiveBlending}
           depthWrite={false}
@@ -220,6 +259,19 @@ export default function SpaceBackground() {
           color="#aaaaff"
           transparent
           opacity={0.4}
+          sizeAttenuation
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+
+      {/* Space dust */}
+      <points ref={dustRef} geometry={dustGeometry}>
+        <pointsMaterial
+          size={0.03}
+          color="#6688aa"
+          transparent
+          opacity={0.15}
           sizeAttenuation
           blending={THREE.AdditiveBlending}
           depthWrite={false}

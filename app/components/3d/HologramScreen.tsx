@@ -35,6 +35,8 @@ export default function HologramScreen({
   const groupRef = useRef<THREE.Group>(null);
   const frameRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
+  const scanlineRef = useRef<THREE.Mesh>(null);
+  const glitchRef = useRef({ intensity: 0, nextGlitch: 0 });
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Track mouse position
@@ -57,33 +59,57 @@ export default function HologramScreen({
     config: { tension: 200, friction: 40 },
   });
 
-  // Hologram flicker effect and mouse-based rotation
-  useFrame((state) => {
+  // Enhanced hologram effects
+  useFrame((state, delta) => {
+    const time = state.clock.elapsedTime;
+
+    // Enhanced glow with stronger intensity
     if (glowRef.current) {
-      const time = state.clock.elapsedTime;
-      const baseOpacity = isSelected ? 0.4 : isHovered ? 0.3 : 0.2;
-      const flicker = Math.sin(time * 3 + position[0] * 10) * 0.05;
+      const baseOpacity = isSelected ? 0.7 : isHovered ? 0.5 : 0.3;
+      const flicker = Math.sin(time * 3 + position[0] * 10) * 0.1;
 
       if (glowRef.current.material instanceof THREE.MeshBasicMaterial) {
         glowRef.current.material.opacity = baseOpacity + flicker;
       }
     }
 
+    // Scanline animation
+    if (scanlineRef.current) {
+      // Move scanline up and down
+      const scanSpeed = 0.5;
+      const yPosition = ((time * scanSpeed) % 4) - 2; // -2 to 2 range
+      scanlineRef.current.position.y = yPosition;
+    }
+
+    // Glitch effect
+    if (groupRef.current) {
+      glitchRef.current.nextGlitch -= delta;
+
+      if (glitchRef.current.nextGlitch <= 0) {
+        // Trigger glitch
+        glitchRef.current.intensity = 0.02 + Math.random() * 0.03;
+        glitchRef.current.nextGlitch = 3 + Math.random() * 7; // Every 3-10 seconds
+      }
+
+      // Apply and decay glitch
+      if (glitchRef.current.intensity > 0) {
+        const glitchOffset = (Math.random() - 0.5) * glitchRef.current.intensity;
+        groupRef.current.position.x = position[0] + glitchOffset;
+        glitchRef.current.intensity *= 0.9; // Decay
+      }
+    }
+
     // Gentle floating animation
     if (groupRef.current && !isSelected) {
-      groupRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5 + position[0]) * 0.05;
+      groupRef.current.position.y = position[1] + Math.sin(time * 0.5 + position[0]) * 0.05;
     }
 
     // Mouse-based rotation for depth effect
     if (groupRef.current) {
-      const maxTilt = 0.15; // Maximum tilt in radians (~8.6 degrees)
-
-      // Calculate target rotation based on mouse position and screen position
-      // Screens further from mouse cursor center should tilt more
+      const maxTilt = 0.15;
       const targetRotationY = mousePosition.x * maxTilt;
       const targetRotationX = -mousePosition.y * maxTilt;
 
-      // Smooth lerp to target rotation
       const currentRotation = groupRef.current.rotation;
       currentRotation.y += (targetRotationY - currentRotation.y) * 0.05;
       currentRotation.x += (targetRotationX - currentRotation.x) * 0.05;
@@ -119,20 +145,53 @@ export default function HologramScreen({
     ? project[`description_${language}`]
     : `Explore ${planet[`name_${language}`]}`;
 
-  // Particle geometry for selected state
+  // Enhanced particle geometry for selected state
   const particleGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(
-      Array.from({ length: 60 }, (_, i) => {
-        const angle = (i / 20) * Math.PI * 2;
-        const radius = 1.8 + Math.random() * 0.3;
+      Array.from({ length: 100 }, (_, i) => {
+        const angle = (i / 30) * Math.PI * 2;
+        const radius = 1.8 + Math.random() * 0.4;
         return [
           Math.cos(angle) * radius,
           Math.sin(angle) * radius,
-          0.1 + Math.random() * 0.1,
+          0.1 + Math.random() * 0.2,
         ];
       }).flat()
     );
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    return geometry;
+  }, []);
+
+  // Data stream particles
+  const dataStreamGeometry = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    const count = 50;
+    const positions = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+      const side = Math.floor(Math.random() * 4); // 4 sides
+      let x, y;
+
+      if (side === 0) { // left
+        x = -1.6;
+        y = (Math.random() - 0.5) * 2;
+      } else if (side === 1) { // right
+        x = 1.6;
+        y = (Math.random() - 0.5) * 2;
+      } else if (side === 2) { // top
+        x = (Math.random() - 0.5) * 3;
+        y = 1.1;
+      } else { // bottom
+        x = (Math.random() - 0.5) * 3;
+        y = -1.1;
+      }
+
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = 0.08 + Math.random() * 0.05;
+    }
+
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     return geometry;
   }, []);
@@ -144,15 +203,27 @@ export default function HologramScreen({
       rotation={rotation}
       scale={scale}
     >
-      {/* Hologram frame */}
+      {/* Enhanced hologram frame */}
       <mesh ref={frameRef}>
-        <boxGeometry args={[3.2, 2.2, 0.05]} />
+        <boxGeometry args={[3.3, 2.3, 0.08]} />
         <meshStandardMaterial
-          color="#1a2a4a"
-          metalness={0.9}
-          roughness={0.1}
+          color="#0a1a3a"
+          metalness={0.95}
+          roughness={0.05}
           transparent
-          opacity={0.3}
+          opacity={0.5}
+          emissive={glowColor}
+          emissiveIntensity={isSelected ? 0.3 : isHovered ? 0.2 : 0.1}
+        />
+      </mesh>
+
+      {/* Frame edge glow */}
+      <mesh position={[0, 0, -0.01]}>
+        <boxGeometry args={[3.35, 2.35, 0.02]} />
+        <meshBasicMaterial
+          color={glowColor}
+          transparent
+          opacity={isSelected ? 0.6 : isHovered ? 0.4 : 0.2}
         />
       </mesh>
 
@@ -165,33 +236,72 @@ export default function HologramScreen({
       >
         <planeGeometry args={[3, 2]} />
         <meshBasicMaterial
-          color="#001122"
+          color="#001a33"
           transparent
-          opacity={0.6}
+          opacity={0.7}
         />
       </mesh>
 
-      {/* Glowing border */}
-      <mesh ref={glowRef} position={[0, 0, 0.04]}>
-        <planeGeometry args={[3.1, 2.1]} />
+      {/* Dual layer glow - inner */}
+      <mesh position={[0, 0, 0.04]}>
+        <planeGeometry args={[3.05, 2.05]} />
         <meshBasicMaterial
           color={glowColor}
           transparent
-          opacity={0.2}
+          opacity={isSelected ? 0.5 : isHovered ? 0.35 : 0.2}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
 
-      {/* Corner accents */}
+      {/* Dual layer glow - outer */}
+      <mesh ref={glowRef} position={[0, 0, 0.045]}>
+        <planeGeometry args={[3.2, 2.2]} />
+        <meshBasicMaterial
+          color={glowColor}
+          transparent
+          opacity={0.3}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+
+      {/* Scanline effect */}
+      <mesh ref={scanlineRef} position={[0, 0, 0.05]}>
+        <planeGeometry args={[3, 0.02]} />
+        <meshBasicMaterial
+          color="#00ffff"
+          transparent
+          opacity={0.3}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+
+      {/* Enhanced corner accents */}
       {[
-        [-1.5, 1, 0.05],
-        [1.5, 1, 0.05],
-        [-1.5, -1, 0.05],
-        [1.5, -1, 0.05],
+        [-1.55, 1.05, 0.05],
+        [1.55, 1.05, 0.05],
+        [-1.55, -1.05, 0.05],
+        [1.55, -1.05, 0.05],
       ].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]}>
-          <boxGeometry args={[0.15, 0.15, 0.02]} />
-          <meshBasicMaterial color={glowColor} transparent opacity={0.8} />
-        </mesh>
+        <group key={i}>
+          <mesh position={pos as [number, number, number]}>
+            <boxGeometry args={[0.2, 0.2, 0.03]} />
+            <meshBasicMaterial
+              color={glowColor}
+              transparent
+              opacity={isSelected ? 1 : isHovered ? 0.9 : 0.7}
+            />
+          </mesh>
+          {/* Corner glow */}
+          <mesh position={[pos[0], pos[1], pos[2] + 0.01]}>
+            <boxGeometry args={[0.25, 0.25, 0.01]} />
+            <meshBasicMaterial
+              color={glowColor}
+              transparent
+              opacity={0.4}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </group>
       ))}
 
       {/* Planet icon/indicator */}
@@ -204,7 +314,7 @@ export default function HologramScreen({
       <Text
         position={[0, 0.3, 0.06]}
         fontSize={0.18}
-        color="#88ccff"
+        color="#aaffff"
         anchorX="center"
         anchorY="middle"
         maxWidth={2.8}
@@ -216,7 +326,7 @@ export default function HologramScreen({
       <Text
         position={[0, -0.1, 0.06]}
         fontSize={0.1}
-        color="#aaddff"
+        color="#ccffff"
         anchorX="center"
         anchorY="middle"
         maxWidth={2.6}
@@ -230,7 +340,7 @@ export default function HologramScreen({
         <Text
           position={[0, -0.6, 0.06]}
           fontSize={0.08}
-          color="#6699cc"
+          color="#88ddff"
           anchorX="center"
           anchorY="middle"
           maxWidth={2.8}
@@ -252,15 +362,30 @@ export default function HologramScreen({
         </Text>
       )}
 
-      {/* Particle effect around selected screen */}
+      {/* Enhanced particle effect around selected screen */}
       {isSelected && (
         <points geometry={particleGeometry}>
           <pointsMaterial
-            size={0.03}
+            size={0.04}
             color={glowColor}
             transparent
-            opacity={0.6}
+            opacity={0.8}
             sizeAttenuation
+            blending={THREE.AdditiveBlending}
+          />
+        </points>
+      )}
+
+      {/* Data stream particles */}
+      {(isSelected || isHovered) && (
+        <points geometry={dataStreamGeometry}>
+          <pointsMaterial
+            size={0.02}
+            color={glowColor}
+            transparent
+            opacity={isSelected ? 0.7 : 0.4}
+            sizeAttenuation
+            blending={THREE.AdditiveBlending}
           />
         </points>
       )}
