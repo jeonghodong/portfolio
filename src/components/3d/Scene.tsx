@@ -319,7 +319,7 @@ export default function Scene() {
               <Suspense fallback={null}>
                 <SpaceBackground />
                 <HologramDisplaySystem selectedPlanetId={selectedPlanetId} hoveredPlanetId={hoveredPlanetId} isWarpActive={isWarpActive} onPlanetSelect={handlePlanetSelect} onPlanetHover={setHoveredPlanetId} onPlanetEnter={handlePlanetEnter} />
-                <WarpJump isActive={isWarpActive} duration={0.5} onComplete={handleWarpComplete} />
+                <WarpJump isActive={isWarpActive} duration={1.2} onComplete={handleWarpComplete} />
                 <CameraAnimator selectedPlanetId={selectedPlanetId} orbitControlsRef={orbitControlsRef} onAnimationComplete={handleCameraAnimationComplete} />
                 <MouseCameraController enabled={!selectedPlanetId && !isWarpActive && !isCameraAnimating} maxAngle={70} sensitivity={1} orbitControlsRef={orbitControlsRef} />
               </Suspense>
