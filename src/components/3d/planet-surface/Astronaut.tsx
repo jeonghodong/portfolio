@@ -99,25 +99,37 @@ export default function Astronaut({ isExiting }: AstronautProps) {
         const angle = Math.atan2(direction.x, direction.z);
         astronautRef.current.rotation.y = angle;
 
-        // Moon walk animation - slower, bouncier
+        // Moon walk animation - slower, bouncier with realistic step timing
         runAnimationTime.current +=
           delta * PLANET_SURFACE_CONFIG.MOON_WALK_STEP_FREQUENCY;
+
+        const leftLegCycle = Math.sin(runAnimationTime.current);
+        const rightLegCycle = Math.sin(runAnimationTime.current + Math.PI);
+
         if (leftLegRef.current && rightLegRef.current) {
           // Alternating legs with slower swing
-          leftLegRef.current.rotation.x =
-            Math.sin(runAnimationTime.current) * 0.4;
-          rightLegRef.current.rotation.x =
-            Math.sin(runAnimationTime.current + Math.PI) * 0.4;
+          leftLegRef.current.rotation.x = leftLegCycle * 0.5;
+          rightLegRef.current.rotation.x = rightLegCycle * 0.5;
         }
 
-        // Bouncy hop - like moon gravity
-        const hopCycle = Math.sin(runAnimationTime.current);
-        astronautRef.current.position.y =
-          hopCycle > 0
-            ? hopCycle *
-              (PLANET_SURFACE_CONFIG.MOON_WALK_STEP_HEIGHT /
-                PLANET_SURFACE_CONFIG.TERRAIN_NOISE_SCALE)
-            : PLANET_SURFACE_CONFIG.GROUND_LEVEL;
+        // Body bounces when each foot lands (deduced from leg swing)
+        // When leg swings back (negative rotation), foot lands - body should be down
+        // When leg swings forward (positive rotation), foot lifts - body should be up
+        const leftFootLanded = leftLegCycle < 0; // Left foot on ground
+        const rightFootLanded = rightLegCycle < 0; // Right foot on ground
+
+        // Create bouncing effect: body is highest when foot just leaves ground
+        // Use abs to make it always positive, then invert for landing
+        const bounceFactor = Math.max(
+          leftFootLanded ? 0 : Math.abs(leftLegCycle),
+          rightFootLanded ? 0 : Math.abs(rightLegCycle)
+        );
+
+        // Body height: low when foot lands, high when foot lifts
+        const baseHeight = PLANET_SURFACE_CONFIG.GROUND_LEVEL;
+        const maxBounce = PLANET_SURFACE_CONFIG.MOON_WALK_STEP_HEIGHT /
+                          PLANET_SURFACE_CONFIG.TERRAIN_NOISE_SCALE;
+        astronautRef.current.position.y = baseHeight + (bounceFactor * maxBounce * 1.5);
 
         if (!isRunning) setIsRunning(true);
       } else {
@@ -152,88 +164,253 @@ export default function Astronaut({ isExiting }: AstronautProps) {
     <group
       ref={astronautRef}
       position={[2, PLANET_SURFACE_CONFIG.ASTRONAUT_SPAWN_HEIGHT, 0]}
+      renderOrder={999}
     >
-      {/* Head */}
-      <mesh position={[0, 1.5, 0]}>
-        <sphereGeometry args={[0.3, 16, 16]} />
-        <meshStandardMaterial color="#cccccc" metalness={0.3} roughness={0.7} />
-      </mesh>
-
-      {/* Helmet visor */}
-      <mesh position={[0, 1.5, 0.2]}>
-        <sphereGeometry args={[0.25, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      {/* Head - higher quality */}
+      <mesh position={[0, 1.5, 0]} castShadow>
+        <sphereGeometry args={[0.3, 32, 32]} />
         <meshStandardMaterial
-          color="#88ccff"
-          transparent
-          opacity={0.3}
-          metalness={0.8}
-          roughness={0.2}
+          color="#e0e0e0"
+          metalness={0.4}
+          roughness={0.6}
+          envMapIntensity={0.5}
         />
       </mesh>
 
-      {/* Body */}
-      <mesh position={[0, 0.8, 0]}>
-        <cylinderGeometry args={[0.35, 0.4, 0.8, 8]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.8} />
+      {/* Helmet visor - glass effect */}
+      <mesh position={[0, 1.5, 0.22]} castShadow>
+        <sphereGeometry args={[0.28, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial
+          color="#4da6ff"
+          transparent
+          opacity={0.4}
+          metalness={0.9}
+          roughness={0.1}
+          envMapIntensity={1.0}
+        />
       </mesh>
 
-      {/* Backpack/Life support */}
-      <mesh position={[0, 0.9, -0.3]}>
-        <boxGeometry args={[0.4, 0.6, 0.2]} />
-        <meshStandardMaterial color="#888888" metalness={0.5} roughness={0.6} />
+      {/* Helmet ring */}
+      <mesh position={[0, 1.2, 0]}>
+        <torusGeometry args={[0.32, 0.04, 16, 32]} />
+        <meshStandardMaterial color="#666666" metalness={0.8} roughness={0.3} />
       </mesh>
 
-      {/* Arms */}
-      <mesh position={[-0.5, 0.9, 0]}>
-        <cylinderGeometry args={[0.1, 0.1, 0.6, 8]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.8} />
+      {/* Body - torso with better shape */}
+      <mesh position={[0, 0.8, 0]} castShadow>
+        <cylinderGeometry args={[0.38, 0.42, 0.9, 16]} />
+        <meshStandardMaterial
+          color="#f5f5f5"
+          roughness={0.7}
+          metalness={0.1}
+        />
       </mesh>
-      <mesh position={[0.5, 0.9, 0]}>
-        <cylinderGeometry args={[0.1, 0.1, 0.6, 8]} />
-        <meshStandardMaterial color="#ffffff" roughness={0.8} />
+
+      {/* Chest panel details */}
+      <mesh position={[0, 1.0, 0.4]}>
+        <boxGeometry args={[0.3, 0.2, 0.05]} />
+        <meshStandardMaterial color="#333333" metalness={0.6} roughness={0.4} />
       </mesh>
+
+      {/* Control panel lights */}
+      <mesh position={[-0.08, 1.0, 0.43]}>
+        <sphereGeometry args={[0.02, 16, 16]} />
+        <meshBasicMaterial color="#00ff00" />
+      </mesh>
+      <mesh position={[0, 1.0, 0.43]}>
+        <sphereGeometry args={[0.02, 16, 16]} />
+        <meshBasicMaterial color="#ffff00" />
+      </mesh>
+      <mesh position={[0.08, 1.0, 0.43]}>
+        <sphereGeometry args={[0.02, 16, 16]} />
+        <meshBasicMaterial color="#ff0000" />
+      </mesh>
+
+      {/* Backpack/Life support - more detailed */}
+      <group position={[0, 0.9, -0.35]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.45, 0.7, 0.25]} />
+          <meshStandardMaterial color="#999999" metalness={0.6} roughness={0.5} />
+        </mesh>
+        {/* Oxygen tanks */}
+        <mesh position={[-0.12, 0.1, 0]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.5, 16]} />
+          <meshStandardMaterial color="#666666" metalness={0.7} roughness={0.3} />
+        </mesh>
+        <mesh position={[0.12, 0.1, 0]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.5, 16]} />
+          <meshStandardMaterial color="#666666" metalness={0.7} roughness={0.3} />
+        </mesh>
+        {/* Backpack light */}
+        <pointLight position={[0, 0.3, 0.15]} color="#4da6ff" intensity={0.5} distance={2} />
+      </group>
+
+      {/* Arms - upper and lower sections */}
+      <group position={[-0.5, 1.1, 0]}>
+        {/* Upper arm */}
+        <mesh position={[0, -0.15, 0]} castShadow>
+          <cylinderGeometry args={[0.11, 0.11, 0.4, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
+        </mesh>
+        {/* Elbow joint */}
+        <mesh position={[0, -0.35, 0]}>
+          <sphereGeometry args={[0.12, 16, 16]} />
+          <meshStandardMaterial color="#cccccc" metalness={0.5} roughness={0.6} />
+        </mesh>
+        {/* Lower arm */}
+        <mesh position={[0, -0.55, 0]} castShadow>
+          <cylinderGeometry args={[0.10, 0.11, 0.4, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
+        </mesh>
+        {/* Glove */}
+        <mesh position={[0, -0.78, 0]} castShadow>
+          <sphereGeometry args={[0.12, 16, 16]} />
+          <meshStandardMaterial color="#ff6600" roughness={0.6} />
+        </mesh>
+      </group>
+
+      <group position={[0.5, 1.1, 0]}>
+        {/* Upper arm */}
+        <mesh position={[0, -0.15, 0]} castShadow>
+          <cylinderGeometry args={[0.11, 0.11, 0.4, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
+        </mesh>
+        {/* Elbow joint */}
+        <mesh position={[0, -0.35, 0]}>
+          <sphereGeometry args={[0.12, 16, 16]} />
+          <meshStandardMaterial color="#cccccc" metalness={0.5} roughness={0.6} />
+        </mesh>
+        {/* Lower arm */}
+        <mesh position={[0, -0.55, 0]} castShadow>
+          <cylinderGeometry args={[0.10, 0.11, 0.4, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
+        </mesh>
+        {/* Glove */}
+        <mesh position={[0, -0.78, 0]} castShadow>
+          <sphereGeometry args={[0.12, 16, 16]} />
+          <meshStandardMaterial color="#ff6600" roughness={0.6} />
+        </mesh>
+      </group>
 
       {/* Left leg */}
       <group ref={leftLegRef} position={[-0.15, 0.3, 0]}>
-        <mesh position={[0, -0.15, 0]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.5, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.8} />
+        {/* Upper leg */}
+        <mesh position={[0, -0.15, 0]} castShadow>
+          <cylinderGeometry args={[0.13, 0.13, 0.5, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
         </mesh>
-        {/* Foot */}
-        <mesh position={[0, -0.45, 0.1]}>
-          <boxGeometry args={[0.15, 0.1, 0.25]} />
-          <meshStandardMaterial color="#444444" roughness={0.9} />
+        {/* Knee joint */}
+        <mesh position={[0, -0.4, 0]}>
+          <sphereGeometry args={[0.14, 16, 16]} />
+          <meshStandardMaterial color="#cccccc" metalness={0.5} roughness={0.6} />
+        </mesh>
+        {/* Lower leg */}
+        <mesh position={[0, -0.65, 0]} castShadow>
+          <cylinderGeometry args={[0.12, 0.13, 0.5, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
+        </mesh>
+        {/* Ankle */}
+        <mesh position={[0, -0.92, 0]}>
+          <sphereGeometry args={[0.13, 16, 16]} />
+          <meshStandardMaterial color="#cccccc" metalness={0.5} roughness={0.6} />
+        </mesh>
+        {/* Boot */}
+        <mesh position={[0, -1.05, 0.12]} castShadow>
+          <boxGeometry args={[0.18, 0.15, 0.3]} />
+          <meshStandardMaterial color="#333333" roughness={0.8} />
+        </mesh>
+        {/* Boot sole */}
+        <mesh position={[0, -1.13, 0.12]}>
+          <boxGeometry args={[0.2, 0.03, 0.35]} />
+          <meshStandardMaterial color="#111111" roughness={0.9} />
         </mesh>
       </group>
 
       {/* Right leg */}
       <group ref={rightLegRef} position={[0.15, 0.3, 0]}>
-        <mesh position={[0, -0.15, 0]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.5, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.8} />
+        {/* Upper leg */}
+        <mesh position={[0, -0.15, 0]} castShadow>
+          <cylinderGeometry args={[0.13, 0.13, 0.5, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
         </mesh>
-        {/* Foot */}
-        <mesh position={[0, -0.45, 0.1]}>
-          <boxGeometry args={[0.15, 0.1, 0.25]} />
-          <meshStandardMaterial color="#444444" roughness={0.9} />
+        {/* Knee joint */}
+        <mesh position={[0, -0.4, 0]}>
+          <sphereGeometry args={[0.14, 16, 16]} />
+          <meshStandardMaterial color="#cccccc" metalness={0.5} roughness={0.6} />
+        </mesh>
+        {/* Lower leg */}
+        <mesh position={[0, -0.65, 0]} castShadow>
+          <cylinderGeometry args={[0.12, 0.13, 0.5, 12]} />
+          <meshStandardMaterial color="#f5f5f5" roughness={0.7} />
+        </mesh>
+        {/* Ankle */}
+        <mesh position={[0, -0.92, 0]}>
+          <sphereGeometry args={[0.13, 16, 16]} />
+          <meshStandardMaterial color="#cccccc" metalness={0.5} roughness={0.6} />
+        </mesh>
+        {/* Boot */}
+        <mesh position={[0, -1.05, 0.12]} castShadow>
+          <boxGeometry args={[0.18, 0.15, 0.3]} />
+          <meshStandardMaterial color="#333333" roughness={0.8} />
+        </mesh>
+        {/* Boot sole */}
+        <mesh position={[0, -1.13, 0.12]}>
+          <boxGeometry args={[0.2, 0.03, 0.35]} />
+          <meshStandardMaterial color="#111111" roughness={0.9} />
         </mesh>
       </group>
 
       {/* Jetpack flames when landing or exiting */}
       {(showLandingFlames || isExiting) && (
         <>
-          <mesh position={[0.08, 0.1, -0.2]}>
-            <coneGeometry args={[0.08, 0.6, 8]} />
-            <meshBasicMaterial color="#ff6600" transparent opacity={0.9} />
+          {/* Left thruster - outer flame */}
+          <mesh position={[0.12, 0.15, -0.25]}>
+            <coneGeometry args={[0.1, 0.7, 8]} />
+            <meshBasicMaterial color="#ff4400" transparent opacity={0.8} />
           </mesh>
-          <mesh position={[-0.08, 0.1, -0.2]}>
-            <coneGeometry args={[0.08, 0.6, 8]} />
-            <meshBasicMaterial color="#ff6600" transparent opacity={0.9} />
+          {/* Left thruster - inner flame */}
+          <mesh position={[0.12, 0.15, -0.25]}>
+            <coneGeometry args={[0.06, 0.5, 8]} />
+            <meshBasicMaterial color="#ffaa00" transparent opacity={0.9} />
           </mesh>
-          {/* Smoke trail */}
-          <mesh position={[0, -0.3, -0.2]}>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshBasicMaterial color="#888888" transparent opacity={0.5} />
+          {/* Left thruster - core */}
+          <mesh position={[0.12, 0.15, -0.25]}>
+            <coneGeometry args={[0.03, 0.3, 8]} />
+            <meshBasicMaterial color="#ffffff" />
+          </mesh>
+          {/* Left thruster glow */}
+          <pointLight position={[0.12, 0.15, -0.25]} color="#ff6600" intensity={2} distance={3} />
+
+          {/* Right thruster - outer flame */}
+          <mesh position={[-0.12, 0.15, -0.25]}>
+            <coneGeometry args={[0.1, 0.7, 8]} />
+            <meshBasicMaterial color="#ff4400" transparent opacity={0.8} />
+          </mesh>
+          {/* Right thruster - inner flame */}
+          <mesh position={[-0.12, 0.15, -0.25]}>
+            <coneGeometry args={[0.06, 0.5, 8]} />
+            <meshBasicMaterial color="#ffaa00" transparent opacity={0.9} />
+          </mesh>
+          {/* Right thruster - core */}
+          <mesh position={[-0.12, 0.15, -0.25]}>
+            <coneGeometry args={[0.03, 0.3, 8]} />
+            <meshBasicMaterial color="#ffffff" />
+          </mesh>
+          {/* Right thruster glow */}
+          <pointLight position={[-0.12, 0.15, -0.25]} color="#ff6600" intensity={2} distance={3} />
+
+          {/* Smoke/exhaust clouds */}
+          <mesh position={[0.12, -0.2, -0.25]}>
+            <sphereGeometry args={[0.18, 16, 16]} />
+            <meshBasicMaterial color="#666666" transparent opacity={0.4} />
+          </mesh>
+          <mesh position={[-0.12, -0.2, -0.25]}>
+            <sphereGeometry args={[0.18, 16, 16]} />
+            <meshBasicMaterial color="#666666" transparent opacity={0.4} />
+          </mesh>
+          <mesh position={[0, -0.4, -0.25]}>
+            <sphereGeometry args={[0.2, 16, 16]} />
+            <meshBasicMaterial color="#555555" transparent opacity={0.3} />
           </mesh>
         </>
       )}
