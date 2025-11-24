@@ -10,11 +10,7 @@ interface WarpJumpProps {
   onComplete?: () => void;
 }
 
-export default function WarpJump({
-  isActive,
-  duration = 2.5,
-  onComplete,
-}: WarpJumpProps) {
+export default function WarpJump({ isActive, duration = 2.5, onComplete }: WarpJumpProps) {
   const { camera } = useThree();
   const starsRef = useRef<THREE.Points>(null);
   const startTimeRef = useRef<number>(0);
@@ -71,8 +67,7 @@ export default function WarpJump({
 
     // Move stars towards camera (creating streak effect)
     if (starsRef.current) {
-      const posArray = starsRef.current.geometry.attributes.position
-        .array as Float32Array;
+      const posArray = starsRef.current.geometry.attributes.position.array as Float32Array;
 
       for (let i = 0; i < posArray.length / 3; i++) {
         const i3 = i * 3;
@@ -113,25 +108,13 @@ export default function WarpJump({
       {/* Warp stars */}
       <points ref={starsRef}>
         <bufferGeometry attach="geometry" {...starsGeometry} />
-        <pointsMaterial
-          size={0.2}
-          color="#aaccff"
-          transparent
-          opacity={0.9}
-          sizeAttenuation
-          blending={THREE.AdditiveBlending}
-        />
+        <pointsMaterial size={0.2} color="#aaccff" transparent opacity={0.9} sizeAttenuation blending={THREE.AdditiveBlending} />
       </points>
 
       {/* Flash effect */}
       <mesh position={[0, 0, -5]}>
         <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.000001}
-          blending={THREE.AdditiveBlending}
-        />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.000001} blending={THREE.AdditiveBlending} />
       </mesh>
     </group>
   );

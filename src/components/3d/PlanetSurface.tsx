@@ -20,6 +20,7 @@ interface PlanetSurfaceProps {
   onFlagClick: () => void;
   onBack: () => void;
   isExiting: boolean;
+  selectedProject: Project | null;
 }
 
 export default function PlanetSurface({
@@ -28,6 +29,7 @@ export default function PlanetSurface({
   onFlagClick,
   onBack,
   isExiting,
+  selectedProject,
 }: PlanetSurfaceProps) {
   const {
     particleMultiplier,
@@ -77,7 +79,7 @@ export default function PlanetSurface({
       <ParticleSystem planet={planet} particleMultiplier={particleMultiplier} />
 
       {/* Astronaut */}
-      <Astronaut planet={planet} isExiting={isExiting} />
+      <Astronaut planet={planet} isExiting={isExiting} selectedProject={selectedProject} />
 
       {/* Easter Eggs */}
       <PlanetEasterEggs planet={planet} />

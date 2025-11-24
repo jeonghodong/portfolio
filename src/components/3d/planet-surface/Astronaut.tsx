@@ -3,15 +3,16 @@
 import { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Planet } from "@/src/types";
+import { Planet, Project } from "@/src/types";
 import { PLANET_SURFACE_CONFIG } from "@/src/constants/3d-config";
 
 interface AstronautProps {
   planet: Planet;
   isExiting: boolean;
+  selectedProject: Project | null;
 }
 
-export default function Astronaut({ isExiting }: AstronautProps) {
+export default function Astronaut({ isExiting, selectedProject }: AstronautProps) {
   const astronautRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
@@ -56,8 +57,75 @@ export default function Astronaut({ isExiting }: AstronautProps) {
       }
     }
 
-    // Astronaut mouse following - only when landed and not exiting
+    // Astronaut mouse following or flag watching - only when landed and not exiting
     if (!isLandingRef.current && !isExiting && astronautRef.current) {
+      // If project is selected, move to flag and watch it (ignore all mouse/touch input)
+      if (selectedProject) {
+        const flagPosition = new THREE.Vector3(-1.5, PLANET_SURFACE_CONFIG.GROUND_LEVEL, 0);
+        const currentPos = astronautPosition.current;
+        const distToFlag = currentPos.distanceTo(flagPosition);
+
+        if (distToFlag > 0.05) {
+          // Move toward flag position
+          const moveSpeed = PLANET_SURFACE_CONFIG.MOON_WALK_SPEED;
+          const direction = flagPosition.clone().sub(currentPos).normalize();
+          currentPos.add(
+            direction.multiplyScalar(Math.min(moveSpeed * delta, distToFlag))
+          );
+
+          // Face the flag (at [0, 0, 0])
+          const flagLookAt = new THREE.Vector3(0, 0, 0);
+          const lookDirection = flagLookAt.clone().sub(currentPos).normalize();
+          const angle = Math.atan2(lookDirection.x, lookDirection.z);
+          astronautRef.current.rotation.y = angle;
+
+          // Walking animation while moving to flag
+          runAnimationTime.current +=
+            delta * PLANET_SURFACE_CONFIG.MOON_WALK_STEP_FREQUENCY;
+
+          const leftLegCycle = Math.sin(runAnimationTime.current);
+          const rightLegCycle = Math.sin(runAnimationTime.current + Math.PI);
+
+          if (leftLegRef.current && rightLegRef.current) {
+            leftLegRef.current.rotation.x = leftLegCycle * 0.5;
+            rightLegRef.current.rotation.x = rightLegCycle * 0.5;
+          }
+
+          const leftFootLanded = leftLegCycle < 0;
+          const rightFootLanded = rightLegCycle < 0;
+          const bounceFactor = Math.max(
+            leftFootLanded ? 0 : Math.abs(leftLegCycle),
+            rightFootLanded ? 0 : Math.abs(rightLegCycle)
+          );
+
+          const baseHeight = PLANET_SURFACE_CONFIG.GROUND_LEVEL;
+          const maxBounce = PLANET_SURFACE_CONFIG.MOON_WALK_STEP_HEIGHT /
+                            PLANET_SURFACE_CONFIG.TERRAIN_NOISE_SCALE;
+          astronautRef.current.position.y = baseHeight + (bounceFactor * maxBounce * 1.5);
+
+          if (!isRunning) setIsRunning(true);
+        } else {
+          // Arrived at flag - stand still and watch
+          if (leftLegRef.current && rightLegRef.current) {
+            leftLegRef.current.rotation.x = 0;
+            rightLegRef.current.rotation.x = 0;
+          }
+          astronautRef.current.position.y = PLANET_SURFACE_CONFIG.GROUND_LEVEL;
+
+          // Keep facing the flag
+          const flagLookAt = new THREE.Vector3(0, 0, 0);
+          const lookDirection = flagLookAt.clone().sub(currentPos).normalize();
+          const angle = Math.atan2(lookDirection.x, lookDirection.z);
+          astronautRef.current.rotation.y = angle;
+
+          if (isRunning) setIsRunning(false);
+        }
+
+        // Update astronaut position
+        astronautRef.current.position.x = currentPos.x;
+        astronautRef.current.position.z = currentPos.z;
+      } else {
+        // Normal mouse following behavior
       // Raycast to ground plane
       raycaster.setFromCamera(pointer, camera);
       const intersectPoint = new THREE.Vector3();
@@ -145,6 +213,7 @@ export default function Astronaut({ isExiting }: AstronautProps) {
       // Update astronaut position
       astronautRef.current.position.x = currentPos.x;
       astronautRef.current.position.z = currentPos.z;
+      }
     }
 
     // Astronaut exit animation - rocket launch!
