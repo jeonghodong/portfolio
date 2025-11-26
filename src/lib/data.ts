@@ -404,19 +404,172 @@ Through this project, I hope users will think twice when consuming news and cons
   {
     id: "3",
     title: "SCF",
-    title_ko: "SCF - S3 + CloudFront Auto Deploy CLI",
-    title_en: "SCF - S3 + CloudFront Auto Deploy CLI",
+    title_ko: "CloudFront Auto Deploy CLI",
+    title_en: "CloudFront Auto Deploy CLI",
     description: "Static website AWS deployment automation CLI",
     description_ko: "정적 웹사이트 AWS 배포 자동화 CLI 도구",
     description_en: "Static website AWS deployment automation CLI tool",
     longDescription:
       "A TypeScript-based CLI tool that automates the entire deployment process for static websites to AWS with a single command. Features incremental deployment through file hash comparison, reducing deployment time by 87% (from 15 minutes to 2 minutes). Published as an npm package for open-source availability.",
-    longDescription_ko:
-      "정적 웹사이트 AWS 배포 시 S3 업로드, CloudFront 설정, 캐시 무효화를 매번 수동으로 처리해야 하는 반복 작업으로 시간 낭비와 휴먼 에러가 발생했습니다. TypeScript 기반 CLI 도구를 개발하여 단일 명령어로 전체 배포 과정을 자동화했으며, 파일 해시 비교를 통한 증분 배포로 배포 시간을 15분에서 2분으로 87% 단축했습니다. npm 패키지로 배포하여 오픈소스화했습니다.",
-    longDescription_en:
-      "Manual handling of S3 uploads, CloudFront configuration, and cache invalidation for static website AWS deployment caused time waste and human errors. Developed a TypeScript-based CLI tool to automate the entire deployment process with a single command, reducing deployment time by 87% (from 15 minutes to 2 minutes) through incremental deployment using file hash comparison. Published as an npm package for open-source availability.",
+    longDescription_ko: `## 프로젝트 배경
+
+많은 개발자들이 자신의 제품을 빠르게 출시하고 시장에서 테스트해보고 싶어합니다. 소프트웨어 웹 서비스의 경우 **배포**가 핵심적인 단계인데, 특히 정적 웹사이트 배포에서 반복적인 수동 작업이 큰 걸림돌이 되었습니다.
+
+AWS에서 정적 웹사이트를 배포할 때마다:
+- **S3 버킷**에 파일 업로드
+- **CloudFront** 배포 설정
+- **캐시 무효화** 처리
+- **Route53** 도메인 연결
+- **ACM** 인증서 설정
+
+이 모든 작업을 AWS 콘솔에서 직접 수동으로 처리해야 했고, 매번 **15분 이상**이 소요되었습니다. 반복적인 작업은 **휴먼 에러**의 원인이 되기도 했습니다.
+
+
+## 베스트 프랙티스 선택
+
+정적 웹사이트 배포 방식은 다양하지만, 제가 선택한 베스트 프랙티스는 **S3 + CloudFront + Route53 + ACM** 조합이었습니다.
+
+이 조합의 장점:
+- **유지보수 편리** - 서버리스 아키텍처로 관리 포인트 최소화
+- **확장성 우수** - CloudFront CDN을 통한 글로벌 배포
+- **비용 효율** - 사용량 기반 과금으로 초기 비용 부담 없음
+- **높은 가용성** - AWS 인프라의 안정성 활용
+
+하지만 이 조합도 **배포할 때마다 AWS 콘솔에서 직접 리소스를 생성하고 설정**해야 하는 번거로움이 있었습니다.
+
+
+## 해결 방안
+
+**"라이브러리로 만들어서 개발자들이 쉽게 배포할 수 있게 하자!"**
+
+이 아이디어에서 SCF 프로젝트가 시작되었습니다.
+
+### 기술적 접근
+
+- **AWS SDK v3** 를 사용하여 AWS 서비스 자동화
+- **AWS CLI Credentials** 활용으로 보안성 확보 (사용자의 액세스 키를 코드에 노출하지 않음)
+- **Commander.js**로 직관적인 CLI 인터페이스 구현
+- **Zod**로 설정 파일 스키마 검증
+
+![SCF CLI](/images/scf/scf.png)
+
+
+## 핵심 기능
+
+### 단일 명령어 배포
+\`\`\`bash
+npx scf-deploy deploy
+\`\`\`
+한 줄의 명령어로 S3 업로드부터 CloudFront 캐시 무효화까지 전체 배포 과정을 자동화했습니다.
+
+### 증분 배포 (Incremental Deploy)
+**파일 해시 비교**를 통해 변경된 파일만 선택적으로 업로드합니다.
+- 전체 배포: 15분 → **증분 배포: 2분**
+- **87% 배포 시간 단축**
+
+### 자동 캐시 무효화
+배포 완료 후 CloudFront 캐시를 자동으로 무효화하여 즉시 변경사항이 반영됩니다.
+
+
+## 기술 스택
+
+- **TypeScript** - 타입 안전성과 개발 생산성
+- **Commander.js** - CLI 프레임워크
+- **AWS SDK v3** - AWS 서비스 연동
+- **Zod** - 런타임 스키마 검증
+- **Husky** - Git hooks를 통한 코드 품질 관리
+- **Github Actions** - CI/CD 파이프라인
+
+
+## 향후 계획
+
+현재 유닛, 통합, E2E 테스트 코드를 적용해놓았지만, AWS의 다양한 커맨드들이 모든 상황에서 안정적으로 동작할지에 대한 고민이 있습니다.
+
+더 나은 방법으로 **CloudFormation** 템플릿 활용을 고려하고 있습니다:
+- AWS 자원 내에서 S3-CF-Route53-ACM 생성 로직을 템플릿화
+- **인프라 코드(IaC)** 로서의 안정성 확보
+- AWS 네이티브 도구 활용으로 호환성 향상`,
+    longDescription_en: `## Project Background
+
+Many developers want to quickly launch their products and test them in the market. For software web services, **deployment** is a critical step, and repetitive manual tasks in static website deployment became a major obstacle.
+
+When deploying a static website on AWS, every time you need to:
+- Upload files to **S3 bucket**
+- Configure **CloudFront** distribution
+- Handle **cache invalidation**
+- Connect **Route53** domain
+- Set up **ACM** certificate
+
+All these tasks had to be done manually through the AWS console, taking **over 15 minutes** each time. Repetitive tasks also became a source of **human errors**.
+
+
+## Best Practice Selection
+
+There are various approaches to static website deployment, but my chosen best practice was the **S3 + CloudFront + Route53 + ACM** combination.
+
+Benefits of this combination:
+- **Easy maintenance** - Serverless architecture minimizes management points
+- **Excellent scalability** - Global distribution through CloudFront CDN
+- **Cost efficient** - Usage-based billing with no upfront costs
+- **High availability** - Leveraging AWS infrastructure reliability
+
+However, this combination still required **manually creating and configuring resources in AWS console** for each deployment.
+
+
+## Solution
+
+**"Let's create a library so developers can deploy easily!"**
+
+This idea sparked the SCF project.
+
+### Technical Approach
+
+- **AWS SDK v3** for AWS service automation
+- **AWS CLI Credentials** for security (no access keys exposed in code)
+- **Commander.js** for intuitive CLI interface
+- **Zod** for configuration file schema validation
+
+![SCF CLI](/images/scf/scf.png)
+
+
+## Core Features
+
+### Single Command Deployment
+\`\`\`bash
+npx scf-deploy deploy
+\`\`\`
+Automated the entire deployment process from S3 upload to CloudFront cache invalidation with a single command.
+
+### Incremental Deploy
+Selectively uploads only changed files through **file hash comparison**.
+- Full deployment: 15 min → **Incremental: 2 min**
+- **87% deployment time reduction**
+
+### Automatic Cache Invalidation
+Automatically invalidates CloudFront cache after deployment for immediate reflection of changes.
+
+
+## Tech Stack
+
+- **TypeScript** - Type safety and developer productivity
+- **Commander.js** - CLI framework
+- **AWS SDK v3** - AWS service integration
+- **Zod** - Runtime schema validation
+- **Husky** - Code quality management through Git hooks
+- **Github Actions** - CI/CD pipeline
+
+
+## Future Plans
+
+While unit, integration, and E2E tests are implemented, there are concerns about whether all AWS commands will work reliably in every situation.
+
+Considering **CloudFormation** templates as a better approach:
+- Templatize S3-CF-Route53-ACM creation logic within AWS resources
+- Secure stability as **Infrastructure as Code (IaC)**
+- Improved compatibility using AWS native tools`,
     period: "2025.10 - 2025.11",
     technologies: ["TypeScript", "Commander.js", "AWS SDK v3", "Zod", "Husky", "Github Actions"],
+    imageUrl: "/images/scf/scf.png",
     featured: false,
   },
   {
