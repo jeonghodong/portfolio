@@ -1,11 +1,4 @@
-import {
-  PersonalInfo,
-  Project,
-  Skill,
-  Experience,
-  Planet,
-  Capsule,
-} from "@/src/types";
+import { PersonalInfo, Project, Skill, Experience, Planet, Capsule } from "@/src/types";
 
 export const personalInfo: PersonalInfo = {
   name: "Jeonghо Dong",
@@ -22,30 +15,204 @@ export const personalInfo: PersonalInfo = {
 export const projects: Project[] = [
   {
     id: "1",
-    title: "Boogie Boogie Crew",
-    title_ko: "루돌프의 수족냉증을 막아줘",
-    title_en: "Save Rudolph's Freezing Hooves",
-    description: "Christmas-themed letter exchange service",
-    description_ko: "크리스마스 시즌 타겟 편지 교환 서비스",
-    description_en:
-      "Christmas-themed letter exchange service for sharing warm messages",
-    longDescription:
-      "A service where users can send Christmas letters (socks) to their Rudolph during the Christmas season. Built with a team of 2 frontend developers and 1 designer, this service achieved 300 active users and handled 30,000 requests. Worked on both frontend interface implementation and backend server construction using NestJS.",
-    longDescription_ko:
-      "당시 프론트엔드 2명 / 디자이너 1명으로 구성된 팀입니다. 해당 서비스는 크리스마스 시즌을 타겟으로 한 나의 루돌프에게 주변 사람들에게 양말(편지)을 즉 크리스마스 기념 편지를 받는 서비스입니다. 백엔드와 프론트엔드 둘 다 작업을 진행하였고 해당 서비스로 실사용자 300명 30,000건의 트래픽을 받은 경험이 있습니다.",
-    longDescription_en:
-      "Built with a team of 2 frontend developers and 1 designer, this Christmas-themed service allows users to receive letters (socks) from friends for their Rudolph. Worked on both frontend and backend development, achieving 300 active users and handling 30,000 traffic requests during the Christmas season.",
+    title: "루돌프의 수족냉증을 부탁해",
+    title_ko: "루돌프의 수족냉증을 부탁해",
+    title_en: "Save Rudolph's Cold Hooves",
+    description: "5-day Christmas letter exchange viral service",
+    description_ko: "5일 만에 완성한 크리스마스 편지 교환 바이럴 서비스",
+    description_en: "Christmas letter exchange viral service completed in just 5 days",
+    longDescription: "A Christmas-limited service where friends exchange warm letters through a unique sock collection mechanism. Built by a team of 1 designer and 2 developers in just 5 days, from planning to deployment.",
+    longDescription_ko: `## 프로젝트 개요
+
+크리스마스 시즌을 맞아 단 5일이라는 짧은 기간 동안, 디자이너 1명과 개발자 2명이 모여 특별한 단기 이벤트 서비스를 만들었습니다. **루돌프의 수족냉증을 부탁해**는 친구들에게 따뜻한 편지를 주고받는 크리스마스 한정 서비스입니다.
+
+제약된 시간과 리소스 속에서도 기획부터 UX/UI 설계, 화면 구성, 문제 대응까지 전 과정을 주도하며 프로젝트를 완성했습니다. 특히 크리스마스라는 시즌성과 한정된 기간을 활용해 사용자의 기대감과 몰입도를 극대화하는 것이 핵심 목표였습니다.
+
+
+## 핵심 기능 및 UX 설계
+
+### 양말 수집 메커니즘
+
+서비스의 핵심은 **양말 4개를 모아야 편지를 열람할 수 있다**는 독특한 구조입니다. 사용자는 친구들로부터 양말(편지)을 선물받고, 4개가 모이면 루돌프가 따뜻해지면서 편지를 읽을 수 있게 됩니다. 이 메커니즘은 단순히 편지를 주고받는 것이 아니라, 친구들의 참여를 유도하고 기대감을 높이는 장치로 작동합니다.
+
+### 크리스마스 한정 인터랙션
+
+특별한 양말은 **12월 25일에만 열리는 한정 인터랙션**으로 설계했습니다. 이를 통해 크리스마스 당일까지 서비스에 재방문하도록 유도하고, 특별한 날의 의미를 강조했습니다.
+
+### 사용자 플로우
+
+서비스 흐름을 최소 단계로 설계하여 직관성을 높였습니다:
+
+- **로그인** - 카카오톡 소셜 로그인으로 간편하게 시작
+- **루돌프 생성** - 나만의 루돌프 캐릭터 만들기
+- **링크 공유** - 친구들에게 내 루돌프 링크 전달
+- **양말 수집** - 친구들로부터 편지(양말) 받기
+- **편지 열람** - 4개가 모이면 편지 읽기
+
+## 서비스 시연
+
+### 1. 카카오톡 소셜 로그인
+
+초반 나의 루돌프를 생성하기 위해 카카오톡 소셜 로그인을 진행합니다.
+
+![카카오톡 소셜 로그인](/images/rusumack/login.gif)
+
+### 2. 루돌프 생성
+
+로그인 후 나만의 루돌프를 생성하게 됩니다.
+
+![루돌프 생성](/images/rusumack/create.gif)
+
+### 3. 링크 공유
+
+나의 루돌프가 생성되면 링크 복사 기능이 생깁니다. 해당 링크를 친구들에게 공유하여 나의 루돌프에게 양말(편지)을 선물할 수 있습니다.
+
+![링크 공유](/images/rusumack/check-link.gif)
+
+### 4. 양말 보내기 & 편지 읽기
+
+친구들이 양말을 보내고, 4개가 모이면 편지를 열람할 수 있습니다.
+
+![양말 보내기](/images/rusumack/post.gif)
+
+![편지 읽기](/images/rusumack/read.gif)
+
+## UI/UX 설계 과정
+
+### 빠른 실행력
+
+와이어프레임 설계부터 일러스트와 시각적 요소를 포함한 화면 구성까지 **단 3일 만에 완료**했습니다. 짧은 기간이었지만 사용자 경험의 핵심 흐름에 집중하여 불필요한 요소는 과감히 제거하고, 크리스마스 분위기를 살릴 수 있는 비주얼에 집중했습니다.
+
+### 사용자 테스트 및 검증
+
+배포 전, 초기 10명 내외의 사용자 테스트를 통해 서비스 흐름과 직관성을 점검했습니다. 이후 **구글 애널리틱스**를 활용해 실제 사용 데이터를 확인하며 UX 설계가 의도대로 작동하는지 지속적으로 검증했습니다.
+
+## 프로모션 및 성과
+
+MZ세대가 많이 모이는 커뮤니티와 SNS, 그리고 토스 광고를 활용해 직접 프로모션을 진행했습니다. 크리스마스 시즌의 특성과 독특한 서비스 컨셉이 입소문을 타면서 빠르게 확산되었습니다.
+
+초기 기획 목표는 조회수 1,000회와 로그인 생성자 50명으로 보수적으로 설정했습니다. 하지만 12월 17일 기준, 예상을 훨씬 뛰어넘는 성과를 거두었습니다:
+
+**🎯 목표를 10배 이상 초과 달성**하며 짧은 기간에도 의미 있는 임팩트를 만들어낼 수 있음을 증명했습니다.
+
+## 문제 해결 사례
+
+### 크리스마스 편지 노출 오류
+
+배포 직후, 크리스마스 당일(12월 25일)에만 열려야 하는 특별한 편지가 사전에 노출되는 오류를 발견했습니다. 이는 서비스의 핵심 경험을 해치는 심각한 문제였습니다.
+
+즉시 개발팀과 협업하여 문제의 원인을 파악하고, **1시간 내에 수정 배포를 완료**했습니다. 이 과정에서 UX는 단순한 화면 설계가 아니라, 사용자 경험 전체 흐름을 책임지고 문제를 신속히 개선하는 과정임을 체감했습니다.
+
+## 회고 및 배운 점
+
+### 제약 속에서의 빠른 실행력
+
+5일이라는 짧은 기간과 제한된 리소스 속에서도, 명확한 목표와 우선순위 설정으로 프로젝트를 성공적으로 완료할 수 있었습니다. 모든 기능을 구현하려 하기보다는, 핵심 경험에 집중하고 불필요한 요소를 과감히 제거하는 것이 중요했습니다.
+
+### 데이터 기반 UX 검증의 중요성
+
+초기 사용자 테스트와 구글 애널리틱스를 통한 데이터 분석은, UX 설계가 실제로 의도대로 작동하는지 확인할 수 있는 중요한 지표였습니다. 직관에만 의존하지 않고 데이터로 검증하는 습관이 중요함을 배웠습니다.
+
+### 팀 협업의 힘
+
+짧은 기간에 높은 퀄리티의 결과물을 만들어낼 수 있었던 것은 디자이너와 개발자 간의 긴밀한 협업 덕분이었습니다. 서로의 영역을 존중하면서도 적극적으로 소통하고, 문제가 발생했을 때 빠르게 대응할 수 있는 팀워크가 프로젝트 성공의 핵심이었습니다.`,
+    longDescription_en: `## Project Overview
+
+During the Christmas season, a team of 1 designer and 2 developers came together for just 5 days to create a special short-term event service. **'Save Rudolph's Cold Hooves'** is a Christmas-limited service where friends exchange warm letters.
+
+Despite time and resource constraints, I led the entire process from planning to UX/UI design, screen composition, and problem resolution. The core goal was to maximize user anticipation and engagement by leveraging the seasonal nature and limited timeframe of Christmas.
+
+## Core Features & UX Design
+
+### Sock Collection Mechanism
+
+The core of the service is a unique structure where **"you need to collect 4 socks to read the letters."** Users receive socks (letters) as gifts from friends, and when 4 are collected, Rudolph warms up and the letters become readable. This mechanism doesn't just facilitate letter exchange—it encourages friend participation and builds anticipation.
+
+### Christmas-Limited Interaction
+
+Special socks were designed as **limited interactions that only open on December 25th**. This encouraged revisits to the service until Christmas day and emphasized the significance of the special day.
+
+### User Flow
+
+The service flow was designed with minimal steps for maximum intuitiveness:
+
+- **Login** - Easy start with KakaoTalk social login
+- **Create Rudolph** - Create your own Rudolph character
+- **Share Link** - Send your Rudolph link to friends
+- **Collect Socks** - Receive letters (socks) from friends
+- **Read Letters** - Read letters when 4 are collected
+
+## Service Demo
+
+### 1. KakaoTalk Social Login
+
+Start by logging in with KakaoTalk to create your Rudolph.
+
+![KakaoTalk Social Login](/images/rusumack/login.gif)
+
+### 2. Create Rudolph
+
+After logging in, create your own Rudolph.
+
+![Create Rudolph](/images/rusumack/create.gif)
+
+### 3. Share Link
+
+Once your Rudolph is created, a link copy function appears. Share this link with friends so they can gift socks (letters) to your Rudolph.
+
+![Share Link](/images/rusumack/check-link.gif)
+
+### 4. Send Socks & Read Letters
+
+Friends send socks, and when 4 are collected, you can read the letters.
+
+![Send Socks](/images/rusumack/post.gif)
+
+![Read Letters](/images/rusumack/read.gif)
+
+## UI/UX Design Process
+
+### Fast Execution
+
+From wireframe design to screen composition including illustrations and visual elements, **completed in just 3 days**. Despite the short timeframe, we focused on the core user experience flow, boldly removing unnecessary elements while focusing on visuals that captured the Christmas atmosphere.
+
+### User Testing & Validation
+
+Before deployment, we tested with about 10 initial users to verify the service flow and intuitiveness. We then used **Google Analytics** to continuously validate whether the UX design was working as intended.
+
+## Promotion & Results
+
+We conducted direct promotion through communities and SNS where MZ generation gathers, as well as Toss advertising. The Christmas season characteristics and unique service concept spread rapidly through word of mouth.
+
+Initial planning goals were conservatively set at 1,000 views and 50 login users. However, as of December 17th, we achieved results far exceeding expectations:
+
+**🎯 Exceeded goals by more than 10x**, proving that meaningful impact can be achieved even in a short period.
+
+## Problem Solving Case
+
+### Christmas Letter Exposure Bug
+
+Right after deployment, we discovered a bug where special letters that should only open on Christmas day (December 25th) were being exposed prematurely. This was a serious issue that compromised the core service experience.
+
+We immediately collaborated with the development team to identify the cause and **completed the fix deployment within 1 hour**. Through this process, I realized that UX is not just about screen design, but about taking responsibility for the entire user experience flow and quickly resolving issues.
+
+## Retrospective & Lessons Learned
+
+### Fast Execution Under Constraints
+
+Despite the 5-day timeframe and limited resources, we successfully completed the project through clear goals and priority setting. Rather than trying to implement all features, focusing on the core experience and boldly removing unnecessary elements was crucial.
+
+### Importance of Data-Driven UX Validation
+
+Initial user testing and data analysis through Google Analytics were important indicators to verify whether UX design was working as intended. I learned the importance of not relying solely on intuition but validating with data.
+
+### Power of Team Collaboration
+
+Being able to produce high-quality results in a short period was thanks to close collaboration between designer and developer. Teamwork that respects each other's domains while actively communicating and responding quickly to problems was key to project success.`,
     period: "2023.12 - 2024.01",
-    teamSize: "Frontend 2, Designer 1",
-    technologies: [
-      "TypeScript",
-      "Next.js",
-      "React",
-      "styled-components",
-      "NestJS",
-      "Nginx",
-      "AWS (S3, CloudFront, Route53, Certificate Manager, EC2)",
-    ],
+    teamSize: "Designer 1, Developer 2",
+    technologies: ["Next.js", "Tailwind CSS", "Nest.js", "MySQL", "AWS (EC2, Route53, S3, CloudFront)"],
+    imageUrl: "/images/rusumack/post.gif",
     featured: true,
   },
   {
@@ -54,76 +221,221 @@ export const projects: Project[] = [
     title_ko: "뉴스잽",
     title_en: "NewsZap",
     description: "AI-powered news bias detection service",
-    description_ko: "뉴스 편파성 감지 AI 서비스",
-    description_en:
-      "AI-powered service for detecting political bias in news articles",
-    longDescription:
-      "A service designed to reduce news bias by analyzing the political leanings of news articles. Using AI and keyword analysis, the system evaluates news topics and content to determine political orientation, presenting the results visually as numerical scores. This helps users make clearer judgments on political matters.",
-    longDescription_ko:
-      "해당 서비스는 뉴스의 편파성을 줄이기 위한 서비스입니다. 뉴스의 주제, 내용 등 다양한 요소를 AI 및 키워드로 기사의 정치적 성향을 판단 후 최종으로 수치를 시각적으로 나타냅니다. 정치적인 문제에 사용자들이 뚜렷한 판단을 할 수 있도록 도움을 주기 위해 시작하였습니다.",
-    longDescription_en:
-      "This service aims to reduce news bias by analyzing various elements such as news topics and content using AI and keywords to determine the political orientation of articles. The final bias score is visualized numerically to help users make clearer judgments on political issues.",
-    period: "2024.05 - 2024.06",
-    technologies: [
-      "TypeScript",
-      "Next.js",
-      "Emotion",
-      "Python",
-      "Ollama AI",
-      "Monorepo",
-      "AWS (S3, CloudFront, Route53, Certificate Manager, EC2)",
-    ],
+    description_ko: "AI 기반 뉴스 편파성 분석 플랫폼",
+    description_en: "AI-powered news bias analysis platform",
+    longDescription: "An innovative news platform that uses AI technology to quantify and visualize political bias in news articles, helping users make more informed judgments.",
+    longDescription_ko: `## 프로젝트 배경
+
+현대 사회에서 뉴스 소비는 일상이 되었지만, 동시에 **미디어 편파성**이라는 큰 문제에 직면하고 있습니다. 같은 사건을 다루더라도 언론사마다 다른 시각으로 보도하고, 독자들은 어떤 기사가 객관적인지 판단하기 어려워합니다.
+
+News Zap은 이런 문제를 해결하기 위해 탄생했습니다. **AI 기술을 활용하여 각 기사의 정치적 편파성을 수치화하고 시각적으로 표현**함으로써, 사용자가 더 현명한 판단을 내릴 수 있도록 돕는 혁신적인 뉴스 플랫폼입니다.
+
+
+## 핵심 기능
+
+### 편파성 수치화 시스템
+
+각 뉴스 기사의 정치적 성향을 **-100에서 +100 사이의 스케일**로 수치화합니다:
+
+- **-100 ~ -50**: 진보 성향
+- **-50 ~ +50**: 중도 성향
+- **+50 ~ +100**: 보수 성향
+
+이 수치는 기사의 제목, 본문 내용, 사용된 키워드 등을 종합적으로 분석하여 산출됩니다.
+
+### AI 기반 분석
+
+**Ollama AI 서버**를 활용하여 기사의 내용을 심층 분석합니다. 단순한 키워드 매칭이 아닌, 문맥을 이해하고 뉘앙스를 파악하여 보다 정확한 편파성 점수를 제공합니다.
+
+
+## 서비스 시연
+
+### 메인 화면
+
+뉴스 기사들이 카드 형태로 나열되며, 각 카드에는 편파성 수치가 색상으로 시각화되어 표시됩니다.
+
+![메인 화면](/images/news-zap/home.gif)
+
+### 기사 카드
+
+각 기사별로 정치적 성향을 직관적으로 보여주는 카드 UI입니다. 사용자는 한눈에 기사의 편향성을 파악할 수 있습니다.
+
+![기사 카드](/images/news-zap/card.png)
+
+### AI 분석 결과
+
+기사 디테일 페이지에서는 제목과 내용을 기반으로 Ollama AI 서버에 요청하여 상세한 분석 결과를 제공합니다.
+
+![AI 분석 결과](/images/news-zap/ai.png)
+
+## 기술 스택
+
+### Frontend
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Emotion (CSS-in-JS)
+- **State Management**: TanStack Query (React Query)
+- **HTTP Client**: ky
+
+### Backend
+- **API Proxy**: Next.js API Routes
+- **News Data**: DeepSearch News API
+- **AI Analysis**: Ollama AI Server
+
+### Infrastructure
+- **Deployment**: AWS (S3, CloudFront, Route53, EC2)
+- **Architecture**: Monorepo 구조
+
+## 기술적 도전과 해결
+
+### AI 응답 최적화
+
+Ollama AI의 응답 시간이 길어 사용자 경험이 저하되는 문제가 있었습니다. 이를 해결하기 위해:
+
+- **스트리밍 응답** 구현으로 사용자에게 실시간 피드백 제공
+- **캐싱 전략** 도입으로 동일 기사 재분석 시 즉시 응답
+- **로딩 상태 UX** 개선으로 대기 시간 체감 감소
+
+### 편파성 알고리즘 설계
+
+단순 키워드 기반 분석의 한계를 극복하기 위해:
+
+- AI의 **문맥 이해 능력** 활용
+- **다중 지표** (제목, 본문, 인용문 등) 종합 분석
+- 지속적인 **피드백 루프**를 통한 정확도 개선
+
+## 마치며
+
+미디어 편파성 문제는 하루아침에 해결될 수 없는 복잡한 사회적 이슈입니다. 하지만 기술을 통해 조금이라도 더 나은 방향으로 나아갈 수 있다면, 그것만으로도 충분한 가치가 있다고 생각합니다.
+
+> **"완벽한 객관성은 존재하지 않지만, 더 나은 균형을 위해 노력할 수는 있습니다."**
+
+이 프로젝트를 통해 사용자들이 뉴스를 소비할 때 한 번 더 생각하고, 다양한 관점을 고려하는 계기가 되기를 바랍니다.`,
+    longDescription_en: `## Project Background
+
+In modern society, news consumption has become a daily routine, but at the same time, we face a significant problem called **media bias**. Even when covering the same events, different media outlets report from different perspectives, making it difficult for readers to judge which articles are objective.
+
+News Zap was created to solve this problem. It's an innovative news platform that **quantifies and visually represents the political bias of each article using AI technology**, helping users make more informed judgments.
+
+## Core Features
+
+### Bias Quantification System
+
+Each news article's political orientation is quantified on a **scale from -100 to +100**:
+
+- **-100 to -50**: Progressive/Liberal leaning
+- **-50 to +50**: Moderate/Centrist
+- **+50 to +100**: Conservative leaning
+
+This score is calculated by comprehensively analyzing the article's title, body content, and keywords used.
+
+### AI-Based Analysis
+
+Utilizing the **Ollama AI server** for in-depth analysis of article content. Rather than simple keyword matching, it understands context and captures nuances to provide more accurate bias scores.
+
+## Service Demo
+
+### Main Screen
+
+News articles are displayed in card format, with bias scores visually represented through colors on each card.
+
+![Main Screen](/images/news-zap/home.gif)
+
+### Article Card
+
+A card UI that intuitively shows the political orientation of each article. Users can grasp the bias at a glance.
+
+![Article Card](/images/news-zap/card.png)
+
+### AI Analysis Results
+
+The article detail page requests the Ollama AI server based on the title and content to provide detailed analysis results.
+
+![AI Analysis Results](/images/news-zap/ai.png)
+
+## Tech Stack
+
+### Frontend
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Emotion (CSS-in-JS)
+- **State Management**: TanStack Query (React Query)
+- **HTTP Client**: ky
+
+### Backend
+- **API Proxy**: Next.js API Routes
+- **News Data**: DeepSearch News API
+- **AI Analysis**: Ollama AI Server
+
+### Infrastructure
+- **Deployment**: AWS (S3, CloudFront, Route53, EC2)
+- **Architecture**: Monorepo structure
+
+## Technical Challenges and Solutions
+
+### AI Response Optimization
+
+The long response time from Ollama AI was degrading user experience. To solve this:
+
+- Implemented **streaming responses** for real-time feedback to users
+- Introduced **caching strategy** for instant responses when re-analyzing the same article
+- Improved **loading state UX** to reduce perceived wait time
+
+### Bias Algorithm Design
+
+To overcome the limitations of simple keyword-based analysis:
+
+- Utilized AI's **contextual understanding** capabilities
+- **Multi-indicator** comprehensive analysis (title, body, quotes, etc.)
+- Continuous **feedback loops** for accuracy improvement
+
+## Conclusion
+
+Media bias is a complex social issue that cannot be solved overnight. However, if technology can help us move in a slightly better direction, I believe that alone has sufficient value.
+
+> **"Perfect objectivity doesn't exist, but we can strive for better balance."**
+
+Through this project, I hope users will think twice when consuming news and consider diverse perspectives.`,
+    period: "2025.05 - 2025.06",
+    technologies: ["TypeScript", "Next.js", "Emotion", "Python", "Ollama AI", "Monorepo", "AWS (S3, CloudFront, Route53, Certificate Manager, EC2)"],
+    imageUrl: "/images/news-zap/card.png",
     featured: true,
   },
   {
     id: "3",
-    title: "3D Product Showcase",
-    title_ko: "3D 제품 쇼케이스",
-    title_en: "3D Product Showcase",
-    description: "Interactive 3D product visualization platform",
-    description_ko: "인터랙티브 3D 제품 시각화 플랫폼",
-    description_en: "Interactive 3D product visualization platform",
+    title: "SCF",
+    title_ko: "SCF - S3 + CloudFront Auto Deploy CLI",
+    title_en: "SCF - S3 + CloudFront Auto Deploy CLI",
+    description: "Static website AWS deployment automation CLI",
+    description_ko: "정적 웹사이트 AWS 배포 자동화 CLI 도구",
+    description_en: "Static website AWS deployment automation CLI tool",
     longDescription:
-      "Built a cutting-edge e-commerce platform featuring real-time 3D product visualization using Three.js and React. Customers can interact with products in 3D space, customize colors, and view from any angle.",
+      "A TypeScript-based CLI tool that automates the entire deployment process for static websites to AWS with a single command. Features incremental deployment through file hash comparison, reducing deployment time by 87% (from 15 minutes to 2 minutes). Published as an npm package for open-source availability.",
     longDescription_ko:
-      "Three.js와 React를 활용한 실시간 3D 제품 시각화를 특징으로 하는 최첨단 전자상거래 플랫폼을 구축했습니다. 고객은 3D 공간에서 제품과 상호작용하고, 색상을 커스터마이징하며, 모든 각도에서 볼 수 있습니다.",
+      "정적 웹사이트 AWS 배포 시 S3 업로드, CloudFront 설정, 캐시 무효화를 매번 수동으로 처리해야 하는 반복 작업으로 시간 낭비와 휴먼 에러가 발생했습니다. TypeScript 기반 CLI 도구를 개발하여 단일 명령어로 전체 배포 과정을 자동화했으며, 파일 해시 비교를 통한 증분 배포로 배포 시간을 15분에서 2분으로 87% 단축했습니다. npm 패키지로 배포하여 오픈소스화했습니다.",
     longDescription_en:
-      "Built a cutting-edge e-commerce platform featuring real-time 3D product visualization using Three.js and React. Customers can interact with products in 3D space, customize colors, and view from any angle.",
-    period: "2023.06 - 2023.09",
-    technologies: [
-      "React",
-      "Three.js",
-      "Next.js",
-      "TypeScript",
-      "Tailwind CSS",
-    ],
-    demoUrl: "https://demo.example.com",
-    githubUrl: "https://github.com/example/project1",
-    imageUrl: "/projects/project1.jpg",
-    audioUrl: "/audio/project1.mp3",
+      "Manual handling of S3 uploads, CloudFront configuration, and cache invalidation for static website AWS deployment caused time waste and human errors. Developed a TypeScript-based CLI tool to automate the entire deployment process with a single command, reducing deployment time by 87% (from 15 minutes to 2 minutes) through incremental deployment using file hash comparison. Published as an npm package for open-source availability.",
+    period: "2025.10 - 2025.11",
+    technologies: ["TypeScript", "Commander.js", "AWS SDK v3", "Zod", "Husky", "Github Actions"],
     featured: false,
   },
   {
     id: "4",
-    title: "Real-time Collaboration Tool",
-    title_ko: "실시간 협업 도구",
-    title_en: "Real-time Collaboration Tool",
-    description: "Team collaboration platform with live updates",
-    description_ko: "실시간 업데이트를 지원하는 팀 협업 플랫폼",
-    description_en: "Team collaboration platform with live updates",
+    title: "Epoch Crew",
+    title_ko: "찌돌프 코 터트리기",
+    title_en: "Pop Rudolph's Nose",
+    description: "Christmas real-time multiplayer mini-game",
+    description_ko: "카카오톡 친구들과 즐기는 크리스마스 실시간 멀티플레이어 미니게임",
+    description_en: "Christmas real-time multiplayer mini-game with KakaoTalk friends",
     longDescription:
-      "Developed a real-time collaboration platform that enables teams to work together seamlessly. Features include live cursors, instant messaging, and collaborative whiteboard with WebSocket integration.",
+      "A Christmas season real-time multiplayer mini-game where up to 4 players compete by clicking to pop Rudolph's nose. Solved race conditions with transaction-based concurrent access control and achieved 50 concurrent users during Christmas season through KakaoTalk viral sharing.",
     longDescription_ko:
-      "팀이 원활하게 협업할 수 있도록 하는 실시간 협업 플랫폼을 개발했습니다. 실시간 커서, 즉각적인 메시징, WebSocket 통합을 통한 협업 화이트보드 기능을 포함합니다.",
+      "카카오톡 친구들과 즐기는 크리스마스 시즌 한정 실시간 멀티플레이어 미니게임입니다. 최대 4명이 동시 접속하여 클릭으로 루돌프의 코를 터트리는 경쟁 게임으로, Firebase 무료 티어 내에서 실시간 동기화와 동시성 이슈를 해결하는 것이 핵심 과제였습니다. Transaction 기반 동시 접속 제어로 Race Condition을 해결하고, 카카오톡 공유를 통한 바이럴 확산으로 크리스마스 시즌 동시 접속 최대 50명을 달성했습니다.",
     longDescription_en:
-      "Developed a real-time collaboration platform that enables teams to work together seamlessly. Features include live cursors, instant messaging, and collaborative whiteboard with WebSocket integration.",
-    period: "2023.01 - 2023.05",
-    technologies: ["Next.js", "WebSocket", "Redis", "PostgreSQL", "Prisma"],
-    demoUrl: "https://demo.example.com",
-    githubUrl: "https://github.com/example/project2",
-    imageUrl: "/projects/project2.jpg",
-    audioUrl: "/audio/project2.mp3",
-    featured: false,
+      "A Christmas season real-time multiplayer mini-game to enjoy with KakaoTalk friends. Up to 4 players can connect simultaneously to compete by clicking to pop Rudolph's nose. The key challenge was solving real-time synchronization and concurrency issues within Firebase's free tier. Resolved race conditions with transaction-based concurrent access control and achieved maximum 50 concurrent users during Christmas season through KakaoTalk viral sharing.",
+    period: "2025.10 - 2025.11",
+    technologies: ["TypeScript", "Next.js", "TailwindCSS", "Framer Motion", "Zustand", "Firebase", "Kakao SDK", "AWS (S3, CloudFront)", "Husky", "Github Actions"],
+    featured: true,
   },
 ];
 
@@ -161,24 +473,21 @@ export const experiences: Experience[] = [
     company: "Tech Innovation Labs",
     position: "Senior Frontend Developer",
     period: "2022 - Present",
-    description:
-      "Leading frontend development for enterprise web applications. Implemented 3D visualization features and improved performance by 40%.",
+    description: "Leading frontend development for enterprise web applications. Implemented 3D visualization features and improved performance by 40%.",
     technologies: ["React", "Next.js", "Three.js", "TypeScript"],
   },
   {
     company: "Creative Digital Studio",
     position: "Frontend Developer",
     period: "2020 - 2022",
-    description:
-      "Developed interactive websites and web applications for various clients. Specialized in animation and user experience design.",
+    description: "Developed interactive websites and web applications for various clients. Specialized in animation and user experience design.",
     technologies: ["React", "Vue.js", "Framer Motion", "GSAP"],
   },
   {
     company: "Startup Ventures",
     position: "Junior Frontend Developer",
     period: "2019 - 2020",
-    description:
-      "Built responsive web applications and maintained existing codebases. Collaborated with designers to implement pixel-perfect UIs.",
+    description: "Built responsive web applications and maintained existing codebases. Collaborated with designers to implement pixel-perfect UIs.",
     technologies: ["JavaScript", "React", "Sass", "Bootstrap"],
   },
 ];

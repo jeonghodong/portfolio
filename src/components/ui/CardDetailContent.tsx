@@ -3,6 +3,8 @@
 import type { Project } from "@/src/types";
 import { useLanguage } from "@/src/contexts/LanguageContext";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface CardDetailContentProps {
   project: Project;
@@ -119,14 +121,82 @@ export default function CardDetailContent({
         {/* Divider */}
         <div className="border-t border-white/10" />
 
-        {/* Long Description */}
+        {/* Long Description - Markdown Rendered */}
         <div>
           <h3 className="text-xl sm:text-2xl text-white font-bold mb-4 sm:mb-6 md:mb-8">
             {t("프로젝트 소개", "About This Project")}
           </h3>
-          <p className="text-sm sm:text-base md:text-lg text-white leading-relaxed">
-            {displayLongDescription}
-          </p>
+          <div className="max-w-none text-white
+            [&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-12 [&_h2]:mb-5 [&_h2]:pb-3 [&_h2]:border-b [&_h2]:border-white/30
+            [&_h3]:text-lg [&_h3]:sm:text-xl [&_h3]:font-bold [&_h3]:text-white [&_h3]:mt-8 [&_h3]:mb-4
+            [&_p]:text-white [&_p]:leading-loose [&_p]:my-5 [&_p]:tracking-wide
+            [&_strong]:text-white [&_strong]:font-bold
+            [&_ul]:text-white [&_ul]:my-5 [&_ul]:space-y-2 [&_ul]:list-disc [&_ul]:list-inside
+            [&_li]:text-white [&_li]:leading-relaxed
+            [&_img]:rounded-xl [&_img]:my-8 [&_img]:w-full [&_img]:shadow-lg
+            [&_a]:text-blue-400 [&_a]:hover:text-blue-300
+            [&_hr]:border-white/20 [&_hr]:my-10">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                img: ({ src, alt }) => {
+                  const imgSrc = typeof src === "string" ? src : "";
+                  return (
+                    <span className="block relative w-full my-6">
+                      <Image
+                        src={imgSrc}
+                        alt={alt || ""}
+                        width={800}
+                        height={450}
+                        className="rounded-xl w-full h-auto"
+                        unoptimized
+                      />
+                    </span>
+                  );
+                },
+                h2: ({ children }) => (
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mt-12 mb-5 pb-3 border-b border-white/30">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-lg sm:text-xl font-bold text-white mt-8 mb-4">
+                    {children}
+                  </h3>
+                ),
+                p: ({ children }) => (
+                  <p className="text-white leading-loose my-5 tracking-wide">
+                    {children}
+                  </p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="text-white my-5 space-y-2 list-disc list-inside">
+                    {children}
+                  </ul>
+                ),
+                li: ({ children }) => (
+                  <li className="text-white leading-relaxed">
+                    {children}
+                  </li>
+                ),
+                strong: ({ children }) => (
+                  <strong className="!text-white !font-bold">
+                    {children}
+                  </strong>
+                ),
+                em: ({ children }) => (
+                  <em className="!text-white italic">
+                    {children}
+                  </em>
+                ),
+                hr: () => (
+                  <hr className="border-white/20 my-10" />
+                ),
+              }}
+            >
+              {displayLongDescription || ""}
+            </ReactMarkdown>
+          </div>
         </div>
 
         {/* Technologies */}
@@ -138,7 +208,7 @@ export default function CardDetailContent({
             {project.technologies.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 bg-white/10 text-xs sm:text-sm font-medium rounded-full border border-white/20 hover:bg-white/15 transition-colors"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 bg-white/10 text-white text-xs sm:text-sm font-medium rounded-full border border-white/20 hover:bg-white/15 transition-colors"
               >
                 {tech}
               </span>
