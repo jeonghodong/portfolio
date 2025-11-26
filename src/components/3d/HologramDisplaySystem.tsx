@@ -13,6 +13,7 @@ interface HologramDisplaySystemProps {
   onPlanetSelect: (planetId: string) => void;
   onPlanetHover: (planetId: string | null) => void;
   onPlanetEnter: (planetId: string) => void;
+  onShowSnackbar: (planetName: string) => void;
 }
 
 export default function HologramDisplaySystem({
@@ -22,6 +23,7 @@ export default function HologramDisplaySystem({
   onPlanetSelect,
   onPlanetHover,
   onPlanetEnter,
+  onShowSnackbar,
 }: HologramDisplaySystemProps) {
   const { isMobile } = useMobileOptimization();
 
@@ -73,6 +75,7 @@ export default function HologramDisplaySystem({
             onPlanetHover(hovered ? screen.planet.id : null)
           }
           onEnter={() => onPlanetEnter(screen.planet.id)}
+          onShowSnackbar={onShowSnackbar}
         />
       ))}
     </group>

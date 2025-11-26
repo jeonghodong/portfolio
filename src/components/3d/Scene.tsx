@@ -37,6 +37,7 @@ export default function Scene() {
   const [isTVTurnonActive, setIsTVTurnonActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isCameraAnimating, setIsCameraAnimating] = useState(false);
+  const [snackbar, setSnackbar] = useState<{ show: boolean; planetName: string }>({ show: false, planetName: "" });
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const orbitControlsRef = useRef<any>(null);
@@ -113,6 +114,14 @@ export default function Scene() {
 
   const handleCameraAnimationComplete = () => {
     setIsCameraAnimating(false);
+  };
+
+  const handleShowSnackbar = (planetName: string) => {
+    setSnackbar({ show: true, planetName });
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      setSnackbar({ show: false, planetName: "" });
+    }, 3000);
   };
 
   const handleBackToShip = () => {
@@ -217,6 +226,30 @@ export default function Scene() {
         </motion.div>
       )}
 
+      {/* Snackbar for exploration projects */}
+      <AnimatePresence>
+        {snackbar.show && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 z-40"
+          >
+            <div className="bg-gradient-to-r from-amber-500/90 to-orange-500/90 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 rounded-xl border border-amber-300/30 shadow-lg shadow-amber-500/20">
+              <p className="text-white text-sm sm:text-base font-medium text-center">
+                {language === "ko"
+                  ? `🚧 ${snackbar.planetName} 탐사 프로젝트를 준비 중입니다.`
+                  : `🚧 ${snackbar.planetName} exploration project is in preparation.`}
+              </p>
+              <p className="text-white/80 text-xs sm:text-sm text-center mt-1">
+                {language === "ko" ? "먼저 탐사 해보시겠습니까?" : "Would you like to explore first?"}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Planet name indicator when on surface */}
       {sceneMode === "surface" && currentPlanet && !selectedProject && (
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="fixed top-3 sm:top-6 left-1/2 -translate-x-1/2 z-30 text-white/80 text-sm sm:text-base md:text-lg font-light tracking-widest">
@@ -318,7 +351,7 @@ export default function Scene() {
 
               <Suspense fallback={null}>
                 <SpaceBackground />
-                <HologramDisplaySystem selectedPlanetId={selectedPlanetId} hoveredPlanetId={hoveredPlanetId} isWarpActive={isWarpActive} onPlanetSelect={handlePlanetSelect} onPlanetHover={setHoveredPlanetId} onPlanetEnter={handlePlanetEnter} />
+                <HologramDisplaySystem selectedPlanetId={selectedPlanetId} hoveredPlanetId={hoveredPlanetId} isWarpActive={isWarpActive} onPlanetSelect={handlePlanetSelect} onPlanetHover={setHoveredPlanetId} onPlanetEnter={handlePlanetEnter} onShowSnackbar={handleShowSnackbar} />
                 <WarpJump isActive={isWarpActive} duration={1.2} onComplete={handleWarpComplete} />
                 <CameraAnimator selectedPlanetId={selectedPlanetId} orbitControlsRef={orbitControlsRef} onAnimationComplete={handleCameraAnimationComplete} />
                 <MouseCameraController enabled={!selectedPlanetId && !isWarpActive && !isCameraAnimating} maxAngle={70} sensitivity={1} orbitControlsRef={orbitControlsRef} />

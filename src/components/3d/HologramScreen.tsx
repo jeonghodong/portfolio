@@ -19,6 +19,7 @@ interface HologramScreenProps {
   onSelect: () => void;
   onHover: (hovered: boolean) => void;
   onEnter: () => void;
+  onShowSnackbar: (planetName: string) => void;
 }
 
 export default function HologramScreen({
@@ -32,6 +33,7 @@ export default function HologramScreen({
   onSelect,
   onHover,
   onEnter,
+  onShowSnackbar,
 }: HologramScreenProps) {
   const { language } = useLanguage();
   const groupRef = useRef<THREE.Group>(null);
@@ -117,6 +119,11 @@ export default function HologramScreen({
     } else {
       // Not selected - select and zoom in
       onSelect();
+      // Show snackbar for planets without projects
+      if (!project) {
+        const planetName = language === "ko" ? planet.name_ko : planet.name_en;
+        onShowSnackbar(planetName);
+      }
     }
   };
 
@@ -262,11 +269,17 @@ export default function HologramScreen({
         <Text
           position={[0, -0.9, 0.06]}
           fontSize={0.09}
-          color="#44ff88"
+          color={project ? "#44ff88" : "#ffaa44"}
           anchorX="center"
           anchorY="middle"
         >
-          {language === "ko" ? "클릭하여 출발" : "Click to launch"}
+          {project
+            ? language === "ko"
+              ? "클릭하여 출발"
+              : "Click to launch"
+            : language === "ko"
+              ? "클릭하여 탐사"
+              : "Click to explore"}
         </Text>
       )}
 
