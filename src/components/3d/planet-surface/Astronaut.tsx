@@ -22,6 +22,7 @@ export default function Astronaut({ isExiting, selectedProject }: AstronautProps
   const astronautPosition = useRef(new THREE.Vector3(2, 0, 0));
   const targetPosition = useRef(new THREE.Vector3(2, 0, 0));
   const runAnimationTime = useRef(0);
+  const landingCompleteTime = useRef<number | null>(null);
   const [showLandingFlames, setShowLandingFlames] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const { pointer, camera, raycaster } = useThree();
@@ -54,6 +55,10 @@ export default function Astronaut({ isExiting, selectedProject }: AstronautProps
         setShowLandingFlames(false);
         astronautRef.current.position.y = PLANET_SURFACE_CONFIG.GROUND_LEVEL;
         astronautRef.current.rotation.z = 0;
+        // Record landing complete time
+        if (landingCompleteTime.current === null) {
+          landingCompleteTime.current = state.clock.elapsedTime;
+        }
       }
     }
 
@@ -125,6 +130,23 @@ export default function Astronaut({ isExiting, selectedProject }: AstronautProps
         astronautRef.current.position.x = currentPos.x;
         astronautRef.current.position.z = currentPos.z;
       } else {
+        // Wait 2 seconds after landing before following mouse
+        if (landingCompleteTime.current !== null) {
+          const timeSinceLanding = state.clock.elapsedTime - landingCompleteTime.current;
+          if (timeSinceLanding < 2) {
+            // Standing still during wait period
+            if (leftLegRef.current && rightLegRef.current) {
+              leftLegRef.current.rotation.x = 0;
+              rightLegRef.current.rotation.x = 0;
+            }
+            astronautRef.current.position.y = PLANET_SURFACE_CONFIG.GROUND_LEVEL;
+            astronautRef.current.position.x = astronautPosition.current.x;
+            astronautRef.current.position.z = astronautPosition.current.z;
+            if (isRunning) setIsRunning(false);
+            return;
+          }
+        }
+
         // Normal mouse following behavior
       // Raycast to ground plane
       raycaster.setFromCamera(pointer, camera);

@@ -129,10 +129,10 @@ export default function CardDetailContent({
           <div className="max-w-none text-white
             [&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-12 [&_h2]:mb-5 [&_h2]:pb-3 [&_h2]:border-b [&_h2]:border-white/30
             [&_h3]:text-lg [&_h3]:sm:text-xl [&_h3]:font-bold [&_h3]:text-white [&_h3]:mt-8 [&_h3]:mb-4
-            [&_p]:text-white [&_p]:leading-loose [&_p]:my-5 [&_p]:tracking-wide
+            [&_p]:text-sm [&_p]:sm:text-base [&_p]:md:text-lg [&_p]:text-white [&_p]:leading-loose [&_p]:my-5 [&_p]:tracking-wide
             [&_strong]:text-white [&_strong]:font-bold
             [&_ul]:text-white [&_ul]:my-5 [&_ul]:space-y-2 [&_ul]:list-disc [&_ul]:list-inside
-            [&_li]:text-white [&_li]:leading-relaxed
+            [&_li]:text-sm [&_li]:sm:text-base [&_li]:md:text-lg [&_li]:text-white [&_li]:leading-relaxed
             [&_img]:rounded-xl [&_img]:my-8 [&_img]:w-full [&_img]:shadow-lg
             [&_a]:text-blue-400 [&_a]:hover:text-blue-300
             [&_hr]:border-white/20 [&_hr]:my-10">
@@ -165,7 +165,7 @@ export default function CardDetailContent({
                   </h3>
                 ),
                 p: ({ children }) => (
-                  <p className="text-white leading-loose my-5 tracking-wide">
+                  <p className="text-sm sm:text-base md:text-lg text-white leading-loose my-5 tracking-wide">
                     {children}
                   </p>
                 ),
@@ -175,7 +175,7 @@ export default function CardDetailContent({
                   </ul>
                 ),
                 li: ({ children }) => (
-                  <li className="text-white leading-relaxed">
+                  <li className="text-sm sm:text-base md:text-lg text-white leading-relaxed">
                     {children}
                   </li>
                 ),
