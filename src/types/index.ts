@@ -10,6 +10,13 @@ export interface PersonalInfo {
   audioUrl?: string;
 }
 
+export interface ProjectLink {
+  label: string;
+  label_ko?: string;
+  url: string;
+  icon?: 'npm' | 'blog' | 'docs' | 'video' | 'external';
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -29,6 +36,7 @@ export interface Project {
   imageUrl?: string;
   audioUrl?: string;
   featured: boolean;
+  links?: ProjectLink[];
 }
 
 export interface Skill {

@@ -1,4 +1,4 @@
-import { PersonalInfo, Project, Skill, Experience, Planet, Capsule } from "@/src/types";
+import { Capsule, Experience, PersonalInfo, Planet, Project, Skill } from "@/src/types";
 
 export const personalInfo: PersonalInfo = {
   name: "Jeonghо Dong",
@@ -404,6 +404,13 @@ Through this project, I hope users will think twice when consuming news and cons
   {
     id: "3",
     title: "SCF",
+    links: [
+      {
+        label: "Documentation",
+        url: "https://docs.s3cf.net",
+        icon: "docs",
+      },
+    ],
     title_ko: "CloudFront Auto Deploy CLI",
     title_en: "CloudFront Auto Deploy CLI",
     description: "Static website AWS deployment automation CLI",

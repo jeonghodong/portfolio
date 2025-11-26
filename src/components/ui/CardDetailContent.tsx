@@ -217,13 +217,13 @@ export default function CardDetailContent({
         </div>
 
         {/* Links */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6 sm:pt-8 md:pt-12 pb-4 sm:pb-6 md:pb-8">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-6 sm:pt-8 md:pt-12 pb-4 sm:pb-6 md:pb-8">
           {project.demoUrl && (
             <a
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black font-bold rounded-full text-center hover:bg-white/90 transition-colors text-sm sm:text-base md:text-lg"
+              className="flex-1 min-w-[200px] px-6 py-3 sm:px-8 sm:py-4 bg-white text-black font-bold rounded-full text-center hover:bg-white/90 transition-colors text-sm sm:text-base md:text-lg"
             >
               {t("라이브 데모 보기", "View Live Demo")} →
             </a>
@@ -233,11 +233,22 @@ export default function CardDetailContent({
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 border border-white/20 font-bold rounded-full text-center hover:bg-white/20 transition-colors text-sm sm:text-base md:text-lg"
+              className="flex-1 min-w-[200px] px-6 py-3 sm:px-8 sm:py-4 bg-white/10 border border-white/20 text-white font-bold rounded-full text-center hover:bg-white/20 transition-colors text-sm sm:text-base md:text-lg"
             >
               {t("GitHub에서 보기", "View on GitHub")}
             </a>
           )}
+          {project.links?.map((link, index) => (
+            <a
+              key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 min-w-[200px] px-6 py-3 sm:px-8 sm:py-4 bg-white/10 border border-white/20 text-white font-bold rounded-full text-center hover:bg-white/20 transition-colors text-sm sm:text-base md:text-lg"
+            >
+              {language === "ko" && link.label_ko ? link.label_ko : link.label}
+            </a>
+          ))}
         </div>
       </div>
     </div>
