@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack -H 0.0.0.0",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "npx scf-deploy deploy"
   },
   "dependencies": {
     "@react-spring/three": "^10.0.3",
@@ -20,6 +21,7 @@
     "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "scf-deploy": "^1.1.0",
     "three": "^0.180.0"
   },
   "devDependencies": {
