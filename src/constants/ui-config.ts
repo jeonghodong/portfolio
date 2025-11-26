@@ -48,15 +48,15 @@ export const HOLOGRAM_SCREEN_POSITIONS = {
   POSITIONS: [
     // Top row
     { x: -7, y: 4, z: -5 },
-    { x: 0, y: 5, z: -9 },
-    { x: 7, y: 4, z: -6 },
+    { x: 0, y: 4, z: -5 },
+    { x: 7, y: 4, z: -5 },
     // Middle row
-    { x: -6, y: 0, z: -10 },
-    { x: 0, y: 0, z: -4 },
-    { x: 6, y: 0, z: -8 },
+    { x: -7, y: 0, z: -5 },
+    { x: 0, y: 0, z: -5 },
+    { x: 7, y: 0, z: -5 },
     // Bottom row
-    { x: -7, y: -4, z: -7 },
-    { x: 0, y: -5, z: -10 },
+    { x: -7, y: -4, z: -5 },
+    { x: 0, y: -4, z: -5 },
     { x: 7, y: -4, z: -5 },
   ],
 } as const;
