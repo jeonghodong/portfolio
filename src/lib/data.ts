@@ -1,16 +1,4 @@
-import { Capsule, Experience, PersonalInfo, Planet, Project, Skill } from "@/src/types";
-
-export const personalInfo: PersonalInfo = {
-  name: "Jeonghо Dong",
-  role: "Frontend Developer",
-  tagline: "Crafting immersive web experiences with code and creativity",
-  bio: `I'm a passionate frontend developer specializing in creating interactive and visually stunning web applications. With expertise in React, Next.js, and 3D web graphics, I transform ideas into engaging digital experiences.`,
-  location: "Seoul, South Korea",
-  email: "contact@example.com",
-  github: "https://github.com/yourusername",
-  linkedin: "https://linkedin.com/in/yourusername",
-  audioUrl: "/audio/intro.mp3",
-};
+import { Capsule, Experience, Planet, Project, Skill } from "@/src/types";
 
 export const projects: Project[] = [
   {
@@ -402,7 +390,7 @@ Through this project, I hope users will think twice when consuming news and cons
     featured: true,
   },
   {
-    id: "3",
+    id: "0",
     title: "SCF",
     links: [
       {
@@ -411,8 +399,8 @@ Through this project, I hope users will think twice when consuming news and cons
         icon: "docs",
       },
     ],
-    title_ko: "CloudFront Auto Deploy CLI",
-    title_en: "CloudFront Auto Deploy CLI",
+    title_ko: "SCF",
+    title_en: "SCF",
     description: "Static website AWS deployment automation CLI",
     description_ko: "정적 웹사이트 AWS 배포 자동화 CLI 도구",
     description_en: "Static website AWS deployment automation CLI tool",
@@ -579,24 +567,24 @@ Considering **CloudFormation** templates as a better approach:
     imageUrl: "/images/scf/scf.png",
     featured: false,
   },
-  {
-    id: "4",
-    title: "Epoch Crew",
-    title_ko: "찌돌프 코 터트리기",
-    title_en: "Pop Rudolph's Nose",
-    description: "Christmas real-time multiplayer mini-game",
-    description_ko: "카카오톡 친구들과 즐기는 크리스마스 실시간 멀티플레이어 미니게임",
-    description_en: "Christmas real-time multiplayer mini-game with KakaoTalk friends",
-    longDescription:
-      "A Christmas season real-time multiplayer mini-game where up to 4 players compete by clicking to pop Rudolph's nose. Solved race conditions with transaction-based concurrent access control and achieved 50 concurrent users during Christmas season through KakaoTalk viral sharing.",
-    longDescription_ko:
-      "카카오톡 친구들과 즐기는 크리스마스 시즌 한정 실시간 멀티플레이어 미니게임입니다. 최대 4명이 동시 접속하여 클릭으로 루돌프의 코를 터트리는 경쟁 게임으로, Firebase 무료 티어 내에서 실시간 동기화와 동시성 이슈를 해결하는 것이 핵심 과제였습니다. Transaction 기반 동시 접속 제어로 Race Condition을 해결하고, 카카오톡 공유를 통한 바이럴 확산으로 크리스마스 시즌 동시 접속 최대 50명을 달성했습니다.",
-    longDescription_en:
-      "A Christmas season real-time multiplayer mini-game to enjoy with KakaoTalk friends. Up to 4 players can connect simultaneously to compete by clicking to pop Rudolph's nose. The key challenge was solving real-time synchronization and concurrency issues within Firebase's free tier. Resolved race conditions with transaction-based concurrent access control and achieved maximum 50 concurrent users during Christmas season through KakaoTalk viral sharing.",
-    period: "2025.10 - 2025.11",
-    technologies: ["TypeScript", "Next.js", "TailwindCSS", "Framer Motion", "Zustand", "Firebase", "Kakao SDK", "AWS (S3, CloudFront)", "Husky", "Github Actions"],
-    featured: true,
-  },
+  // {
+  //   id: "4",
+  //   title: "Epoch Crew",
+  //   title_ko: "찌돌프 코 터트리기",
+  //   title_en: "Pop Rudolph's Nose",
+  //   description: "Christmas real-time multiplayer mini-game",
+  //   description_ko: "카카오톡 친구들과 즐기는 크리스마스 실시간 멀티플레이어 미니게임",
+  //   description_en: "Christmas real-time multiplayer mini-game with KakaoTalk friends",
+  //   longDescription:
+  //     "A Christmas season real-time multiplayer mini-game where up to 4 players compete by clicking to pop Rudolph's nose. Solved race conditions with transaction-based concurrent access control and achieved 50 concurrent users during Christmas season through KakaoTalk viral sharing.",
+  //   longDescription_ko:
+  //     "카카오톡 친구들과 즐기는 크리스마스 시즌 한정 실시간 멀티플레이어 미니게임입니다. 최대 4명이 동시 접속하여 클릭으로 루돌프의 코를 터트리는 경쟁 게임으로, Firebase 무료 티어 내에서 실시간 동기화와 동시성 이슈를 해결하는 것이 핵심 과제였습니다. Transaction 기반 동시 접속 제어로 Race Condition을 해결하고, 카카오톡 공유를 통한 바이럴 확산으로 크리스마스 시즌 동시 접속 최대 50명을 달성했습니다.",
+  //   longDescription_en:
+  //     "A Christmas season real-time multiplayer mini-game to enjoy with KakaoTalk friends. Up to 4 players can connect simultaneously to compete by clicking to pop Rudolph's nose. The key challenge was solving real-time synchronization and concurrency issues within Firebase's free tier. Resolved race conditions with transaction-based concurrent access control and achieved maximum 50 concurrent users during Christmas season through KakaoTalk viral sharing.",
+  //   period: "2025.10 - 2025.11",
+  //   technologies: ["TypeScript", "Next.js", "TailwindCSS", "Framer Motion", "Zustand", "Firebase", "Kakao SDK", "AWS (S3, CloudFront)", "Husky", "Github Actions"],
+  //   featured: true,
+  // },
 ];
 
 export const skills: Skill[] = [
