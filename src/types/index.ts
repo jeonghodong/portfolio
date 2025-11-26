@@ -1,20 +1,8 @@
-export interface PersonalInfo {
-  name: string;
-  role: string;
-  tagline: string;
-  bio: string;
-  location: string;
-  email: string;
-  github: string;
-  linkedin: string;
-  audioUrl?: string;
-}
-
 export interface ProjectLink {
   label: string;
   label_ko?: string;
   url: string;
-  icon?: 'npm' | 'blog' | 'docs' | 'video' | 'external';
+  icon?: "npm" | "blog" | "docs" | "video" | "external";
 }
 
 export interface Project {
@@ -41,7 +29,7 @@ export interface Project {
 
 export interface Skill {
   name: string;
-  category: 'frontend' | 'backend' | 'tools' | 'other';
+  category: "frontend" | "backend" | "tools" | "other";
   level: number; // 1-5
   icon?: string;
 }
