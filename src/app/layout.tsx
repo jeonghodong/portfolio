@@ -22,8 +22,7 @@ export const metadata: Metadata = {
     default: "Jeongho Dong - Product Engineer & Frontend Developer",
     template: "%s | Jeongho Dong",
   },
-  description:
-    "I connect tech to impact. Interactive 3D portfolio showcasing web development projects and skills. Frontend Developer specializing in React, Next.js, and Three.js.",
+  description: "I connect tech to impact.",
   keywords: [
     "Frontend Developer",
     "Product Engineer",
