@@ -1,4 +1,4 @@
-import { Capsule, Experience, Planet, Project, Skill } from "@/src/types";
+import { Capsule, Planet, Project, Skill } from "@/src/types";
 
 export const projects: Project[] = [
   {
@@ -8,8 +8,10 @@ export const projects: Project[] = [
     title_en: "Save Rudolph's Cold Hooves",
     description: "5-day Christmas letter exchange viral service",
     description_ko: "5일 만에 완성한 크리스마스 편지 교환 바이럴 서비스",
-    description_en: "Christmas letter exchange viral service completed in just 5 days",
-    longDescription: "A Christmas-limited service where friends exchange warm letters through a unique sock collection mechanism. Built by a team of 1 designer and 2 developers in just 5 days, from planning to deployment.",
+    description_en:
+      "Christmas letter exchange viral service completed in just 5 days",
+    longDescription:
+      "A Christmas-limited service where friends exchange warm letters through a unique sock collection mechanism. Built by a team of 1 designer and 2 developers in just 5 days, from planning to deployment.",
     longDescription_ko: `## 프로젝트 개요
 
 크리스마스 시즌을 맞아 단 5일이라는 짧은 기간 동안, 디자이너 1명과 개발자 2명이 모여 특별한 단기 이벤트 서비스를 만들었습니다. **루돌프의 수족냉증을 부탁해**는 친구들에게 따뜻한 편지를 주고받는 크리스마스 한정 서비스입니다.
@@ -199,7 +201,13 @@ Initial user testing and data analysis through Google Analytics were important i
 Being able to produce high-quality results in a short period was thanks to close collaboration between designer and developer. Teamwork that respects each other's domains while actively communicating and responding quickly to problems was key to project success.`,
     period: "2023.12 - 2024.01",
     teamSize: "Designer 1, Developer 2",
-    technologies: ["Next.js", "Tailwind CSS", "Nest.js", "MySQL", "AWS (EC2, Route53, S3, CloudFront)"],
+    technologies: [
+      "Next.js",
+      "Tailwind CSS",
+      "Nest.js",
+      "MySQL",
+      "AWS (EC2, Route53, S3, CloudFront)",
+    ],
     imageUrl: "/images/rusumack/post.gif",
     featured: true,
   },
@@ -211,7 +219,8 @@ Being able to produce high-quality results in a short period was thanks to close
     description: "AI-powered news bias detection service",
     description_ko: "AI 기반 뉴스 편파성 분석 플랫폼",
     description_en: "AI-powered news bias analysis platform",
-    longDescription: "An innovative news platform that uses AI technology to quantify and visualize political bias in news articles, helping users make more informed judgments.",
+    longDescription:
+      "An innovative news platform that uses AI technology to quantify and visualize political bias in news articles, helping users make more informed judgments.",
     longDescription_ko: `## 프로젝트 배경
 
 현대 사회에서 뉴스 소비는 일상이 되었지만, 동시에 **미디어 편파성**이라는 큰 문제에 직면하고 있습니다. 같은 사건을 다루더라도 언론사마다 다른 시각으로 보도하고, 독자들은 어떤 기사가 객관적인지 판단하기 어려워합니다.
@@ -385,7 +394,15 @@ Media bias is a complex social issue that cannot be solved overnight. However, i
 
 Through this project, I hope users will think twice when consuming news and consider diverse perspectives.`,
     period: "2025.05 - 2025.06",
-    technologies: ["TypeScript", "Next.js", "Emotion", "Python", "Ollama AI", "Monorepo", "AWS (S3, CloudFront, Route53, Certificate Manager, EC2)"],
+    technologies: [
+      "TypeScript",
+      "Next.js",
+      "Emotion",
+      "Python",
+      "Ollama AI",
+      "Monorepo",
+      "AWS (S3, CloudFront, Route53, Certificate Manager, EC2)",
+    ],
     imageUrl: "/images/news-zap/card.png",
     featured: true,
   },
@@ -393,6 +410,10 @@ Through this project, I hope users will think twice when consuming news and cons
     id: "0",
     title: "SCF",
     links: [
+      {
+        label: "Github",
+        url: "https://github.com/SCF-org/scf",
+      },
       {
         label: "Documentation",
         url: "https://docs.s3cf.net",
@@ -563,7 +584,14 @@ Considering **CloudFormation** templates as a better approach:
 - Secure stability as **Infrastructure as Code (IaC)**
 - Improved compatibility using AWS native tools`,
     period: "2025.10 - 2025.11",
-    technologies: ["TypeScript", "Commander.js", "AWS SDK v3", "Zod", "Husky", "Github Actions"],
+    technologies: [
+      "TypeScript",
+      "Commander.js",
+      "AWS SDK v3",
+      "Zod",
+      "Husky",
+      "Github Actions",
+    ],
     imageUrl: "/images/scf/scf.png",
     featured: false,
   },
@@ -614,30 +642,6 @@ export const skills: Skill[] = [
   { name: "Vite", category: "tools", level: 4 },
   { name: "Figma", category: "tools", level: 4 },
   { name: "Storybook", category: "tools", level: 4 },
-];
-
-export const experiences: Experience[] = [
-  {
-    company: "Tech Innovation Labs",
-    position: "Senior Frontend Developer",
-    period: "2022 - Present",
-    description: "Leading frontend development for enterprise web applications. Implemented 3D visualization features and improved performance by 40%.",
-    technologies: ["React", "Next.js", "Three.js", "TypeScript"],
-  },
-  {
-    company: "Creative Digital Studio",
-    position: "Frontend Developer",
-    period: "2020 - 2022",
-    description: "Developed interactive websites and web applications for various clients. Specialized in animation and user experience design.",
-    technologies: ["React", "Vue.js", "Framer Motion", "GSAP"],
-  },
-  {
-    company: "Startup Ventures",
-    position: "Junior Frontend Developer",
-    period: "2019 - 2020",
-    description: "Built responsive web applications and maintained existing codebases. Collaborated with designers to implement pixel-perfect UIs.",
-    technologies: ["JavaScript", "React", "Sass", "Bootstrap"],
-  },
 ];
 
 export const sectionAudios = {

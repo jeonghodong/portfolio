@@ -53,8 +53,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "Jeongho Dong Portfolio",
     title: "Jeongho Dong - Product Engineer & Frontend Developer",
-    description:
-      "I connect tech to impact. Interactive 3D portfolio showcasing web development projects and skills.",
+    description: "I connect tech to impact.",
     images: [
       {
         url: "/open-graph/image.png",
@@ -68,8 +67,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Jeongho Dong - Product Engineer & Frontend Developer",
-    description:
-      "I connect tech to impact. Interactive 3D portfolio showcasing web development projects and skills.",
+    description: "I connect tech to impact.",
     images: ["/open-graph/image.png"],
   },
 
@@ -103,8 +101,7 @@ const jsonLd = {
       "@id": `${SITE_URL}/#website`,
       url: SITE_URL,
       name: "Jeongho Dong Portfolio",
-      description:
-        "I connect tech to impact. Interactive 3D portfolio showcasing web development projects and skills.",
+      description: "I connect tech to impact.",
       inLanguage: ["ko-KR", "en-US"],
     },
     {
@@ -130,8 +127,7 @@ const jsonLd = {
       name: "Jeongho Dong - Product Engineer & Frontend Developer Portfolio",
       isPartOf: { "@id": `${SITE_URL}/#website` },
       about: { "@id": `${SITE_URL}/#person` },
-      description:
-        "I connect tech to impact. Interactive 3D portfolio showcasing web development projects and skills.",
+      description: "I connect tech to impact.",
       inLanguage: ["ko-KR", "en-US"],
     },
   ],
