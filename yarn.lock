@@ -5374,10 +5374,10 @@ safe-regex-test@^1.0.3, safe-regex-test@^1.1.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-scf-deploy@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/scf-deploy/-/scf-deploy-1.1.0.tgz#f8524a8da5f8cb78bd676bd30080b477121846ae"
-  integrity sha512-QAbui7oJdnDtcSmnlnBD9fgn44AWrRXjXYc4n+3DyjP+iMbA2rrVsoiQZnCZd7sBf6ItzoZw+W9+pb7RRA0CfQ==
+scf-deploy@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/scf-deploy/-/scf-deploy-2.0.2.tgz#812be044b705771a67a04144f007cd8bea2b5a1f"
+  integrity sha512-9TS/RxcXR8igmxcwVrhf89k1WhA3f6VCTLv0gBrq9rlpFGD6SZY3MsZbMiO+iaR9gDBI/QD2cAME/sFWNXmvmQ==
   dependencies:
     "@aws-sdk/client-acm" "^3.600.0"
     "@aws-sdk/client-cloudfront" "^3.600.0"

@@ -21,7 +21,7 @@
     "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "scf-deploy": "^1.1.0",
+    "scf-deploy": "^2.0.2",
     "three": "^0.180.0"
   },
   "devDependencies": {
