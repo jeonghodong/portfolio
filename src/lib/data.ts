@@ -593,10 +593,249 @@ Considering **CloudFormation** templates as a better approach:
       "Github Actions",
     ],
     imageUrl: "/images/scf/scf.png",
-    featured: false,
+    featured: true,
+  },
+  {
+    id: "3",
+    title: "Pomean",
+    title_ko: "Pomean",
+    title_en: "Pomean",
+    description: "AI-powered interior business management platform",
+    description_ko: "인테리어 업체를 위한 AI 업무 관리 플랫폼",
+    description_en: "AI-powered business management platform for interior companies",
+    longDescription:
+      "A B2B SaaS platform that integrates 2D/3D floor plan design, quotation system, schedule management, and labor cost management for interior companies. Using AI technology, it automates area calculation, material quantity estimation, and real-time quotation generation.",
+    longDescription_ko: `## 프로젝트 개요
+
+인테리어 업계에서는 도면 설계, 견적 작성, 일정 관리를 각각 다른 도구로 처리하며, 도면이 변경될 때마다 견적서를 처음부터 다시 작성해야 하는 비효율이 있었습니다.
+
+포미안(Pomean)은 이러한 문제를 해결하기 위해 탄생한 **B2B SaaS 플랫폼**입니다. 2D/3D 도면 설계부터 자재 적용, 자동 견적 산출, 일정 및 투입비 관리까지 하나의 플랫폼에서 통합 관리할 수 있습니다.
+
+## 핵심 기능
+
+### 2D/3D 도면 설계 시스템
+
+- **벽/방 그리기**: 직관적인 캔버스 기반 2D 도면 에디터
+- **실시간 면적 계산**: 그리는 즉시 면적(m²) 자동 산출
+- **3D 변환**: 2D 도면을 기반으로 자동 3D 모델링
+- **1인칭 뷰어**: 실제 공간을 걸어다니는 듯한 체험 제공
+
+### 자재 라이브러리 & 적용
+
+바닥, 벽, 천장에 다양한 자재를 드래그 앤 드롭으로 적용하고, 3D 뷰어에서 실시간으로 결과를 확인할 수 있습니다.
+
+- 페인트, 벽지, 타일, 마루, 대리석 등 다양한 카테고리
+- 커스텀 자재 등록 기능
+- 자재 적용 시 견적 자동 업데이트
+
+### 자동 견적 시스템
+
+도면에 적용된 자재를 기반으로 **자동으로 견적서를 생성**합니다.
+
+- 면적 기반 자재 수량 자동 산출
+- 손실률 반영 (기본 5%)
+- PDF/Excel 내보내기 지원
+
+### 프로젝트 관리
+
+- **스케줄 캘린더**: 간트 차트, 월간/주간/일간 뷰
+- **투입비 관리**: 자재비, 인건비, 외주비 통합 관리
+- **수익률 분석**: 예산 vs 실제 비용 비교
+
+### 팀 협업
+
+업체 내 팀원들과 함께 프로젝트를 관리할 수 있습니다.
+
+- **팀원 초대**: 이메일로 새 멤버 초대
+- **역할 관리**: Owner/Member 권한 구분
+- **실시간 협업**: 팀원들과 프로젝트 공유
+
+## 서비스 시연
+
+### 1. 도면에 자재 등록
+
+2D 도면에서 바닥, 벽, 천장을 선택하고 자재 라이브러리에서 원하는 자재를 적용합니다.
+
+![자재 등록](/images/pomean/1.gif)
+
+### 2. 견적서 확인
+
+적용된 자재를 기반으로 자동 산출된 견적서를 확인합니다. 면적, 수량, 단가, 총액이 실시간으로 계산됩니다.
+
+![견적서](/images/pomean/2.png)
+
+### 3. 3D 뷰어
+
+작성한 2D 도면을 3D로 변환하여 공간을 입체적으로 확인할 수 있습니다.
+
+![3D 뷰어](/images/pomean/3.gif)
+
+### 4. 1인칭 뷰어
+
+WASD 키로 공간 내부를 직접 걸어다니며 시공 후 모습을 미리 체험할 수 있습니다.
+
+![1인칭 뷰어](/images/pomean/4.gif)
+
+### 5. 프로젝트 관리
+
+도면 작업을 기반으로 스케줄, 투입비, 공수 등 전체 프로젝트를 통합 관리합니다.
+
+![프로젝트 관리](/images/pomean/5.png)
+
+![스케줄 관리](/images/pomean/schedule.png)
+
+![투입비 관리](/images/pomean/cost.png)
+
+### 6. 팀 관리
+
+팀원을 초대하고 역할을 관리합니다. Owner와 Member 권한으로 구분하여 팀 협업을 지원합니다.
+
+![팀 관리](/images/pomean/setting.png)
+
+## 기술적 도전
+
+### AI 기반 자동화
+
+**LangGraph**와 **LLM API**를 활용하여 다음 기능을 구현했습니다:
+- 자재 추천 시스템
+- 프로젝트 관련 질의응답 챗봇
+- 도면 이미지 → 2D 벡터 자동 변환 (개발 중)
+
+### 실시간 견적 계산
+
+도면 변경 시 **1초 이내에 견적이 업데이트**되도록 최적화했습니다. 면적 계산 알고리즘을 개선하여 복잡한 다각형 공간도 정확하게 처리합니다.
+
+### 3D 렌더링 최적화
+
+**React Three Fiber**를 사용하여 30fps 이상의 부드러운 3D 렌더링을 구현했습니다. LOD(Level of Detail) 적용으로 저사양 기기에서도 원활하게 동작합니다.
+
+## 마치며
+
+포미안은 인테리어 업계의 디지털 전환을 가속화하는 것을 목표로 합니다. 분산된 업무 도구들을 하나로 통합하여, 업체들이 본연의 시공 업무에 더 집중할 수 있도록 지원합니다.`,
+    longDescription_en: `## Project Overview
+
+In the interior industry, floor plan design, quotation preparation, and schedule management are handled with different tools, and there was inefficiency in having to rewrite quotations from scratch whenever floor plans changed.
+
+**Pomean** is a **B2B SaaS platform** created to solve these problems. From 2D/3D floor plan design to material application, automatic quotation calculation, and schedule and labor cost management, everything can be managed in one integrated platform.
+
+## Core Features
+
+### 2D/3D Floor Plan Design System
+
+- **Wall/Room Drawing**: Intuitive canvas-based 2D floor plan editor
+- **Real-time Area Calculation**: Automatic area (m²) calculation as you draw
+- **3D Conversion**: Automatic 3D modeling based on 2D floor plans
+- **First-Person Viewer**: Experience the space as if walking through it
+
+### Material Library & Application
+
+Apply various materials to floors, walls, and ceilings with drag and drop, and view results in real-time in the 3D viewer.
+
+- Various categories including paint, wallpaper, tiles, flooring, marble
+- Custom material registration feature
+- Automatic quotation update when materials are applied
+
+### Automatic Quotation System
+
+**Automatically generates quotations** based on materials applied to the floor plan.
+
+- Automatic material quantity calculation based on area
+- Loss rate reflection (default 5%)
+- PDF/Excel export support
+
+### Project Management
+
+- **Schedule Calendar**: Gantt chart, monthly/weekly/daily views
+- **Cost Management**: Integrated management of material costs, labor costs, outsourcing costs
+- **Profitability Analysis**: Budget vs actual cost comparison
+
+### Team Collaboration
+
+Manage projects together with team members within the company.
+
+- **Invite Team Members**: Invite new members via email
+- **Role Management**: Owner/Member permission separation
+- **Real-time Collaboration**: Share projects with team members
+
+## Service Demo
+
+### 1. Register Materials on Floor Plan
+
+Select floors, walls, and ceilings in the 2D floor plan and apply desired materials from the material library.
+
+![Material Registration](/images/pomean/1.gif)
+
+### 2. Check Quotation
+
+Review the automatically calculated quotation based on applied materials. Area, quantity, unit price, and total are calculated in real-time.
+
+![Quotation](/images/pomean/2.png)
+
+### 3. 3D Viewer
+
+Convert your 2D floor plan to 3D to view the space three-dimensionally.
+
+![3D Viewer](/images/pomean/3.gif)
+
+### 4. First-Person Viewer
+
+Walk around inside the space using WASD keys to preview what it will look like after construction.
+
+![First-Person Viewer](/images/pomean/4.gif)
+
+### 5. Project Management
+
+Manage the entire project including schedule, labor costs, and man-hours based on floor plan work.
+
+![Project Management](/images/pomean/5.png)
+
+![Schedule Management](/images/pomean/schedule.png)
+
+![Cost Management](/images/pomean/cost.png)
+
+### 6. Team Management
+
+Invite team members and manage roles. Supports team collaboration with Owner and Member permissions.
+
+![Team Management](/images/pomean/setting.png)
+
+## Technical Challenges
+
+### AI-Based Automation
+
+Implemented the following features using **LangGraph** and **LLM API**:
+- Material recommendation system
+- Project-related Q&A chatbot
+- Floor plan image → 2D vector automatic conversion (in development)
+
+### Real-time Quotation Calculation
+
+Optimized so that **quotations are updated within 1 second** when floor plans change. Improved area calculation algorithm to accurately handle complex polygon spaces.
+
+### 3D Rendering Optimization
+
+Implemented smooth 3D rendering at 30fps or higher using **React Three Fiber**. Applying LOD (Level of Detail) ensures smooth operation even on low-spec devices.
+
+## Conclusion
+
+Pomean aims to accelerate the digital transformation of the interior industry. By integrating scattered work tools into one, it helps companies focus more on their core construction work.`,
+    period: "2025.12 - Present",
+    technologies: [
+      "Next.js",
+      "Nest.js",
+      "Python",
+      "LangGraph",
+      "LLM API",
+      "Supabase",
+      "Docker",
+      "AWS",
+      "Redis",
+    ],
+    imageUrl: "/images/pomean/3.gif",
+    featured: true,
   },
   // {
-  //   id: "4",
+  //   id: "5",
   //   title: "Epoch Crew",
   //   title_ko: "찌돌프 코 터트리기",
   //   title_en: "Pop Rudolph's Nose",
@@ -711,25 +950,6 @@ export const planets: Planet[] = [
   },
   {
     id: "3",
-    name: "Earth",
-    name_ko: "지구",
-    name_en: "Earth",
-    size: 3.0,
-    textureUrl: "/textures/planets/earth.jpg",
-    position: [6, 4, -9],
-    rotationSpeed: 0.003,
-    projectId: "3",
-    environment: {
-      groundColor: "#4a7c4e",
-      skyColor: "#87ceeb",
-      fogColor: "#b0d4e8",
-      ambientColor: "#ffffff",
-      particleColor: "#88ff88",
-      features: ["grass", "trees", "water"],
-    },
-  },
-  {
-    id: "4",
     name: "Mars",
     name_ko: "화성",
     name_en: "Mars",
@@ -747,80 +967,100 @@ export const planets: Planet[] = [
       features: ["rocks", "sand", "dust"],
     },
   },
-  {
-    id: "5",
-    name: "Jupiter",
-    name_ko: "목성",
-    name_en: "Jupiter",
-    size: 4.5,
-    textureUrl: "/textures/planets/jupiter.jpg",
-    position: [24, 9, -22],
-    rotationSpeed: 0.005,
-    environment: {
-      groundColor: "#d4a06a",
-      skyColor: "#c4956a",
-      fogColor: "#e8c4a0",
-      ambientColor: "#ffddbb",
-      particleColor: "#ffaa66",
-      features: ["clouds", "storms", "gas"],
-    },
-  },
-  {
-    id: "6",
-    name: "Saturn",
-    name_ko: "토성",
-    name_en: "Saturn",
-    size: 4.0,
-    textureUrl: "/textures/planets/saturn.jpg",
-    position: [-18, -11, -28],
-    rotationSpeed: 0.004,
-    hasRing: true,
-    ringTextureUrl: "/textures/planets/saturn_ring.png",
-    environment: {
-      groundColor: "#e8d4a0",
-      skyColor: "#f4e8c4",
-      fogColor: "#fff0d4",
-      ambientColor: "#ffffee",
-      particleColor: "#ffee88",
-      features: ["rings", "clouds", "wind"],
-    },
-  },
-  {
-    id: "7",
-    name: "Uranus",
-    name_ko: "천왕성",
-    name_en: "Uranus",
-    size: 2.8,
-    textureUrl: "/textures/planets/uranus.jpg",
-    position: [14, -9, 20],
-    rotationSpeed: 0.002,
-    environment: {
-      groundColor: "#64b5c4",
-      skyColor: "#88d4e4",
-      fogColor: "#a4e4f0",
-      ambientColor: "#ccffff",
-      particleColor: "#88ffff",
-      features: ["ice", "fog", "crystals"],
-    },
-  },
-  {
-    id: "8",
-    name: "Neptune",
-    name_ko: "해왕성",
-    name_en: "Neptune",
-    size: 3.0,
-    textureUrl: "/textures/planets/neptune.jpg",
-    position: [-6, 13, -32],
-    rotationSpeed: 0.002,
-    environment: {
-      groundColor: "#3464a4",
-      skyColor: "#4488cc",
-      fogColor: "#5599dd",
-      ambientColor: "#aaddff",
-      particleColor: "#66aaff",
-      features: ["storms", "wind", "ice"],
-    },
-  },
+  // {
+  //   id: "4",
+  //   name: "Earth",
+  //   name_ko: "지구",
+  //   name_en: "Earth",
+  //   size: 3.0,
+  //   textureUrl: "/textures/planets/earth.jpg",
+  //   position: [6, 4, -9],
+  //   rotationSpeed: 0.003,
+  //   projectId: "3",
+  //   environment: {
+  //     groundColor: "#4a7c4e",
+  //     skyColor: "#87ceeb",
+  //     fogColor: "#b0d4e8",
+  //     ambientColor: "#ffffff",
+  //     particleColor: "#88ff88",
+  //     features: ["grass", "trees", "water"],
+  //   },
+  // },
+
+  // {
+  //   id: "5",
+  //   name: "Jupiter",
+  //   name_ko: "목성",
+  //   name_en: "Jupiter",
+  //   size: 4.5,
+  //   textureUrl: "/textures/planets/jupiter.jpg",
+  //   position: [24, 9, -22],
+  //   rotationSpeed: 0.005,
+  //   environment: {
+  //     groundColor: "#d4a06a",
+  //     skyColor: "#c4956a",
+  //     fogColor: "#e8c4a0",
+  //     ambientColor: "#ffddbb",
+  //     particleColor: "#ffaa66",
+  //     features: ["clouds", "storms", "gas"],
+  //   },
+  // },
+  // {
+  //   id: "6",
+  //   name: "Saturn",
+  //   name_ko: "토성",
+  //   name_en: "Saturn",
+  //   size: 4.0,
+  //   textureUrl: "/textures/planets/saturn.jpg",
+  //   position: [-18, -11, -28],
+  //   rotationSpeed: 0.004,
+  //   hasRing: true,
+  //   ringTextureUrl: "/textures/planets/saturn_ring.png",
+  //   environment: {
+  //     groundColor: "#e8d4a0",
+  //     skyColor: "#f4e8c4",
+  //     fogColor: "#fff0d4",
+  //     ambientColor: "#ffffee",
+  //     particleColor: "#ffee88",
+  //     features: ["rings", "clouds", "wind"],
+  //   },
+  // },
+  // {
+  //   id: "7",
+  //   name: "Uranus",
+  //   name_ko: "천왕성",
+  //   name_en: "Uranus",
+  //   size: 2.8,
+  //   textureUrl: "/textures/planets/uranus.jpg",
+  //   position: [14, -9, 20],
+  //   rotationSpeed: 0.002,
+  //   environment: {
+  //     groundColor: "#64b5c4",
+  //     skyColor: "#88d4e4",
+  //     fogColor: "#a4e4f0",
+  //     ambientColor: "#ccffff",
+  //     particleColor: "#88ffff",
+  //     features: ["ice", "fog", "crystals"],
+  //   },
+  // },
+  // {
+  //   id: "8",
+  //   name: "Neptune",
+  //   name_ko: "해왕성",
+  //   name_en: "Neptune",
+  //   size: 3.0,
+  //   textureUrl: "/textures/planets/neptune.jpg",
+  //   position: [-6, 13, -32],
+  //   rotationSpeed: 0.002,
+  //   environment: {
+  //     groundColor: "#3464a4",
+  //     skyColor: "#4488cc",
+  //     fogColor: "#5599dd",
+  //     ambientColor: "#aaddff",
+  //     particleColor: "#66aaff",
+  //     features: ["storms", "wind", "ice"],
+  //   },
+  // },
 ];
 
 // Launch Bay style - front row for projects, back row for exploration
